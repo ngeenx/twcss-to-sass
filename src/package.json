@@ -1,0 +1,13 @@
+{
+  "name": "tws-to-sass",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "himalaya": "^1.1.0",
+    "scssfmt": "^1.0.7"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "MIT"
+}

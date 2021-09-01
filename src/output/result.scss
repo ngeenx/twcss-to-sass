@@ -1,0 +1,43 @@
+/* div -> NOTEXT */
+.any-1-div {
+  @apply flex flex-col h-screen bg-gray-100;/*#block_1*//* div -> NOTEXT */
+  .any-2-div {
+    @apply grid place-items-center mx-2 my-20 sm:my-auto;/*#block_1*//* div -> NOTEXT */
+    .any-3-div {
+      @apply w-11/12 p-12 sm:w-8/12 md:w-6/12 lg:w-5/12 2xl:w-4/12 px-6 py-10 sm:px-10 sm:py-6 bg-white rounded-lg shadow-md lg:shadow-lg;/*#block_2*//* h2 -> Login */
+      .any-3-h2 {
+        @apply text-center font-semibold text-3xl lg:text-4xl text-gray-800;/*#block_0*/
+      }/* form -> NOTEXT */
+      .any-4-form {
+        @apply mt-10;/*#block_6*//* label -> E-mail */
+        .any-4-label {
+          @apply block text-xs font-semibold text-gray-600 uppercase;/*#block_0*/
+        }/* input -> NOTEXT */
+        .any-4-input {
+          @apply block w-full py-3 px-1 mt-2 text-gray-800 appearance-none border-b-2 border-gray-100 focus:text-gray-500 focus:outline-none focus:border-gray-200;/*#block_-*/
+        }/* label -> Password */
+        .any-4-label {
+          @apply block mt-2 text-xs font-semibold text-gray-600 uppercase;/*#block_0*/
+        }/* input -> NOTEXT */
+        .any-4-input {
+          @apply block w-full py-3 px-1 mt-2 mb-4 text-gray-800 appearance-none border-b-2 border-gray-100 focus:text-gray-500 focus:outline-none focus:border-gray-200;/*#block_-*/
+        }/* button -> Login */
+        .any-4-button {
+          @apply w-full py-3 mt-10 bg-gray-800 rounded-sm font-medium text-white uppercase focus:outline-none hover:bg-gray-700 hover:shadow-none;/*#block_0*/
+        }/* div -> NOTEXT */
+        .any-5-div {
+          @apply sm:flex sm:flex-wrap mt-8 sm:mb-4 text-sm text-center;/*#block_3*//* a -> Forgot password? */
+          .any-5-a {
+            @apply flex-2 underline;/*#block_0*/
+          }/* p -> or */
+          .any-5-p {
+            @apply flex-1 text-gray-500 text-md mx-4 my-1 sm:my-auto;/*#block_0*/
+          }/* a -> Create an Account */
+          .any-5-a {
+            @apply flex-2 underline;/*#block_0*/
+          }
+        }
+      }
+    }
+  }
+}
