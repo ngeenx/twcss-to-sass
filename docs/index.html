@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.min.css">
+
+    <title>
+        TailwindCSS to SASS Converter
+    </title>
+
+    <style>
+        [v-cloak]>* {
+            display: none
+        }
+
+        [v-cloak]::before {
+            content: "loading…"
+        }
+
+        .code-container {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <v-app v-cloak>
+            <!-- Must have the app property -->
+            <v-toolbar class="pa-0">
+                <v-row>
+                    <v-col cols="2"></v-col>
+                    <v-col class="d-flex justify-space-around">
+                        <v-toolbar-title>
+                            TailwindCSS to SASS Converter
+                        </v-toolbar-title>
+                    </v-col>
+                    <v-col cols="2" class="d-flex justify-end"></v-col>
+            </v-toolbar>
+
+            <v-main class="my-5 mx-5">
+                <v-container fluid>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-row>
+                                <v-col>
+                                    Tailwind template (HTML format)
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <div id="htmlContainer" class="code-container"></div>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="12">
+                            <v-row>
+                                <v-col>
+                                    SASS Output
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <div id="sassContainer" class="code-container"></div>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@1.0.1/dist/twcss-to-sass.js"></script>
+
+    <script>
+        var require = {
+            paths: {
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs'
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
+
+    <script>
+        const isBrowserDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify({
+                theme: {
+                    dark: isBrowserDarkTheme
+                },
+            }),
+
+            data: {
+                htmlInput: null,
+                sassOutput: null,
+                htmlMonacoEditor: null,
+                sassMonacoEditor: null,
+            },
+
+            methods: {
+                loadEditors: function () {
+                    const defaultTemplate =
+                        `<div class="bg-white">\n\t<div class="flex justify-center items-center min-h-screen min-w-full">\n\t\t<div class="flex relative">\n\t\t\t<div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">\n\t\t\t\tMy Text 1\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>`;
+
+                    const {
+                        convertToSass
+                    } = twcssToSass,
+                    theme = this.getCurrentTheme(),
+                        commonEditorConfig = {
+                            theme: `vs-${theme}`,
+                            minimap: {
+                                enabled: false
+                            }
+                        };
+
+                    htmlMonacoEditor = monaco.editor.create(document.getElementById('htmlContainer'), Object
+                        .assign(commonEditorConfig, {
+                            value: defaultTemplate,
+                            language: 'html',
+                        }));
+
+                    sassMonacoEditor = monaco.editor.create(document.getElementById('sassContainer'), Object
+                        .assign(commonEditorConfig, {
+                            language: 'scss',
+                        }));
+
+                    sassMonacoEditor.getModel().setValue(convertToSass(defaultTemplate));
+
+                    htmlMonacoEditor.onDidChangeModelContent(function (e) {
+                        let sassOutput = convertToSass(htmlMonacoEditor.getValue());
+
+                        if (!sassOutput || !sassOutput.length) {
+                            sassOutput = 'Invalid HTML content.';
+                        }
+
+                        sassMonacoEditor.getModel().setValue(sassOutput);
+                    });
+                },
+
+                /** get current browser theme */
+                getCurrentTheme: function () {
+                    if (window.matchMedia) {
+                        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    }
+                },
+
+                /** watch browser theme*/
+                watchBrowserTheme: function () {
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                        const themeOption = {
+                            theme: `vs-${e.matches ? 'dark' : 'light'}`
+                        };
+
+                        htmlMonacoEditor.updateOptions(themeOption);
+                        sassMonacoEditor.updateOptions(themeOption);
+
+                        this.$vuetify.theme.isDark = e.matches;
+                    });
+                }
+            },
+
+            mounted: function () {
+                this.loadEditors();
+                this.watchBrowserTheme();
+            }
+        });
+    </script>
+</body>
+
+</html>
