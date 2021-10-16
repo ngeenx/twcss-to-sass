@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind to SASS Converter</title>
+</head>
+<body>
+    <script src="./twcss-to-sass.js"></script>
+
+    <script>
+        const { convertToSass } = twcssToSass,
+        html = `<div class="bg-white">
+                    <div class="flex justify-center items-center min-h-screen min-w-full">
+                        <div class="flex relative">
+                            <div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">
+                                My Text 1
+                            </div>
+                            <div class="w-72 h-40 bg-yellow-400 transform transition-all skew-x-12 -skew-y-12 absolute -top-4 -left-4 rounded-lg">
+                                My Text 2
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+        console.log(convertToSass(html));
+    </script>
+</body>
+</html>

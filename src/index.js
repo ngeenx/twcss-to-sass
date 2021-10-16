@@ -1,15 +1,17 @@
 'use strict';
 
-const fs = require('fs');
 const parse = require('himalaya');
-const scssfmt = require('scssfmt');
-
+const beautifyCss = require('js-beautify').css;
 const utils = require('./utils.js');
 
-const html = fs.readFileSync('./data/mock3.html', {
-    encoding: 'utf8'
-});
-
+/**
+ * Extract target attributes
+ * 
+ * @param {Object} attributes 
+ * @param {Array} keys 
+ * 
+ * @returns Array
+ */
 const getAttributes = function (attributes, keys) {
     if (!Array.isArray(keys)) {
         keys = [keys];
@@ -34,6 +36,13 @@ const getAttributes = function (attributes, keys) {
     return null;
 };
 
+/**
+ * Parse given HTML content as JSON
+ * 
+ * @param {string} htmlJson 
+ * 
+ * @returns Object
+ */
 const parseHtmlJson = function (htmlJson) {
     if (htmlJson) {
         var _data = null;
@@ -70,6 +79,14 @@ const parseHtmlJson = function (htmlJson) {
     return null;
 };
 
+/**
+ * Extract SASS tree from HTML JSON tree
+ * 
+ * @param {Object} nodeTree 
+ * @param {int} count 
+ * 
+ * @returns string
+ */
 const getSassTree = function (nodeTree, count = 0) {
     if (nodeTree) {
         var _data = null;
@@ -115,12 +132,48 @@ const getSassTree = function (nodeTree, count = 0) {
     return '';
 };
 
-exports.twsToSass = {
-    toSass: function(html){
-        var htmlJson = parse.parse(utils.utils.cleanText(html));
+module.exports = {
+    /**
+     * Convert HMTL to SASS generic method
+     * 
+     * @param {string} html 
+     * @param {Object} options
+     * 
+     * @returns string
+     */
+    convertToSass: function (html, options = null) {
+        if (html && html.length) {
+            const htmlJson = parse.parse(utils.utils.cleanText(html)),
+                sassTreeResult = getSassTree(parseHtmlJson(htmlJson));
 
-        htmlJson = getSassTree(parseHtmlJson(htmlJson));
+            /* Default CSS formatter options */
+            var formatterOptions = {
+                indent_size: '4',
+                indent_char: ' ',
+                max_preserve_newlines: '5',
+                preserve_newlines: true,
+                keep_array_indentation: false,
+                break_chained_methods: false,
+                indent_scripts: 'normal',
+                brace_style: 'collapse',
+                space_before_conditional: true,
+                unescape_strings: false,
+                jslint_happy: false,
+                end_with_newline: false,
+                wrap_line_length: '0',
+                indent_inner_html: false,
+                comma_first: false,
+                e4x: false,
+                indent_empty_lines: false
+              };
 
-        return scssfmt(htmlJson);
+            if (options && options.fomatterOptions){
+                formatterOptions = Object.assign(formatterOptions, options.fomatterOptions);
+            }
+
+            return beautifyCss(sassTreeResult, formatterOptions);
+        }
+
+        return null;
     }
 };
