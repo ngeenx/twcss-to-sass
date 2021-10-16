@@ -25,7 +25,7 @@ const getAttributes = function (attributes, keys) {
 
             let _attribute = attributes.filter((x) => x.key == key);
 
-            _attributes[key] = _attribute.length ? utils.utils.cleanText(_attribute[0].value) : null;
+            _attributes[key] = _attribute.length ? utils.cleanText(_attribute[0].value) : null;
         }
 
         return Object.entries(_attributes).filter((x) => {
@@ -59,11 +59,11 @@ const parseHtmlJson = function (htmlJson) {
 
                 // find text nodes and merge
                 node.text = children.filter((x) => x.type == 'text').map((x) => {
-                    return utils.utils.cleanText(x.content, true);
+                    return utils.cleanText(x.content, true);
                 }).filter((x) => x !== null).join(' ');
 
                 // last cleanup
-                node.text = utils.utils.cleanText(node.text, true);
+                node.text = utils.cleanText(node.text, true);
 
                 // get elements
                 node.children = children.length ? children.filter((x) => x.type == 'element') : null;
@@ -113,6 +113,8 @@ const getSassTree = function (nodeTree, count = 0) {
 
             if (node.attributes) {
                 block += node.attributes.class ? `@apply ${node.attributes.class};` : '';
+
+                node.attributes.style = utils.addMissingSuffix(node.attributes.style, ';');
                 block += node.attributes.style ? `\n${node.attributes.style}\n` : '';
             }
 
@@ -143,7 +145,7 @@ module.exports = {
      */
     convertToSass: function (html, options = null) {
         if (html && html.length) {
-            const htmlJson = parse.parse(utils.utils.cleanText(html)),
+            const htmlJson = parse.parse(utils.cleanText(html)),
                 sassTreeResult = getSassTree(parseHtmlJson(htmlJson));
 
             /* Default CSS formatter options */
