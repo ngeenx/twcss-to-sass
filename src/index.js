@@ -173,7 +173,11 @@ module.exports = {
                 formatterOptions = Object.assign(formatterOptions, options.fomatterOptions);
             }
 
-            return beautifyCss(sassTreeResult, formatterOptions);
+            if (options && options.formatOutput === true){
+                return beautifyCss(sassTreeResult, formatterOptions);
+            }
+
+            return sassTreeResult;
         }
 
         return null;

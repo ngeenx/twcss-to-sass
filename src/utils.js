@@ -37,5 +37,33 @@ module.exports = {
         }
 
         return string;
+    },
+
+    /**
+     * Fix formatter SASS @apply tailwind broken colon (":") syntax
+     * 
+     * Exp: @apply bg-white hover: shadow-2xl ...
+     *                           ^^^
+     * @param {string} content
+     * 
+     * @return string
+     */
+    fixFomatterApplyIssue: function (content) {
+        if (content && content.length) {
+            var lines = content.split('\n'),
+                pattern = /@apply [a-zA-Z0-9-_\/ ]+ [a-zA-Z0-9-_\/]+(: )[a-zA-Z0-9-_\/]+/gm;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (line.match(pattern)) {
+                    lines[i] = line.replace(': ', ':');
+                }
+            }
+
+            return lines.join('\n');
+        }
+
+        return content;
     }
 };
