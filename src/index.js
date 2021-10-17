@@ -178,10 +178,10 @@ module.exports = {
             const htmlJson = parse.parse(utils.cleanText(html)),
                 sassTreeResult = getSassTree(parseHtmlJson(htmlJson));
 
-            if (options && options.formatOutput === true){
+            if (options && options.formatOutput === true) {
                 var _formatterOptions = {};
 
-                if (options && options.fomatterOptions){
+                if (options && options.fomatterOptions) {
                     _formatterOptions = Object.assign(formatterOptions, options.fomatterOptions);
                 }
 

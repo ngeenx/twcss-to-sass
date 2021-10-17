@@ -2,17 +2,19 @@
 <html>
 
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <title>TailwindCSS to SASS Converter</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
+    <!-- Roboto Font -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+
+    <!-- Vuetify -->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+    <!-- Monaco Editor -->
     <link rel="stylesheet" data-name="vs/editor/editor.main"
         href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.min.css">
-
-    <title>
-        TailwindCSS to SASS Converter
-    </title>
 
     <style>
         [v-cloak]>* {
@@ -33,7 +35,6 @@
 <body>
     <div id="app">
         <v-app v-cloak>
-            <!-- Must have the app property -->
             <v-toolbar class="pa-0">
                 <v-row>
                     <v-col cols="2"></v-col>
@@ -81,10 +82,16 @@
         </v-app>
     </div>
 
+    <!-- VueJS -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+
+    <!-- Vuetify -->
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <!-- twcss-to-sass -->
     <script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/twcss-to-sass.js"></script>
 
+    <!-- Monaco Editor -->
     <script>
         var require = {
             paths: {
@@ -96,6 +103,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
 
+    <!-- App -->
     <script>
         const isBrowserDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -115,6 +123,7 @@
             },
 
             methods: {
+                /** load monaco code editors */
                 loadEditors: function () {
                     const defaultTemplate =
                         `<div class="bg-white">\n\t<div class="flex justify-center items-center min-h-screen min-w-full">\n\t\t<div class="flex relative">\n\t\t\t<div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">\n\t\t\t\tMy Text 1\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>`;
