@@ -51,7 +51,7 @@ module.exports = {
     fixFomatterApplyIssue: function (content) {
         if (content && content.length) {
             var lines = content.split('\n'),
-                pattern = /@apply [a-zA-Z0-9-_\/ ]+ [a-zA-Z0-9-_\/]+(: )[a-zA-Z0-9-_\/]+/gm;
+                pattern = /@apply( [a-zA-Z0-9-_\/: ]+)? [a-zA-Z0-9-_\/:]+(: )([a-zA-Z0-9-_\/: ]+)?;/gm;
 
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
