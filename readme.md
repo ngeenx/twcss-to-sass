@@ -3,6 +3,11 @@ HTML template to SASS converter for TailwindCSS
 
 ## **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
 
+## Install 
+```bash
+npm i @egoistdeveloper/twcss-to-sass
+```
+
 ## Browser Example
 
 ```javascript
