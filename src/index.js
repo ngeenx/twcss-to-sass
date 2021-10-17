@@ -5,6 +5,36 @@ const beautifyCss = require('js-beautify').css;
 const utils = require('./utils.js');
 
 /**
+ * Default options
+ */
+const defaultOptions = {
+    formatOutput: true
+};
+
+/**
+ * Default js-beautify css formatter options
+ */
+const formatterOptions = {
+    indent_size: '4',
+    indent_char: ' ',
+    max_preserve_newlines: '5',
+    preserve_newlines: true,
+    keep_array_indentation: false,
+    break_chained_methods: false,
+    indent_scripts: 'normal',
+    brace_style: 'collapse',
+    space_before_conditional: true,
+    unescape_strings: false,
+    jslint_happy: false,
+    end_with_newline: false,
+    wrap_line_length: '0',
+    indent_inner_html: false,
+    comma_first: false,
+    e4x: false,
+    indent_empty_lines: false
+};
+
+/**
  * Extract target attributes
  * 
  * @param {Object} attributes 
@@ -143,38 +173,21 @@ module.exports = {
      * 
      * @returns string
      */
-    convertToSass: function (html, options = null) {
+    convertToSass: function (html, options = defaultOptions) {
         if (html && html.length) {
             const htmlJson = parse.parse(utils.cleanText(html)),
                 sassTreeResult = getSassTree(parseHtmlJson(htmlJson));
 
-            /* Default CSS formatter options */
-            var formatterOptions = {
-                indent_size: '4',
-                indent_char: ' ',
-                max_preserve_newlines: '5',
-                preserve_newlines: true,
-                keep_array_indentation: false,
-                break_chained_methods: false,
-                indent_scripts: 'normal',
-                brace_style: 'collapse',
-                space_before_conditional: true,
-                unescape_strings: false,
-                jslint_happy: false,
-                end_with_newline: false,
-                wrap_line_length: '0',
-                indent_inner_html: false,
-                comma_first: false,
-                e4x: false,
-                indent_empty_lines: false
-              };
-
-            if (options && options.fomatterOptions){
-                formatterOptions = Object.assign(formatterOptions, options.fomatterOptions);
-            }
-
             if (options && options.formatOutput === true){
-                return beautifyCss(sassTreeResult, formatterOptions);
+                var _formatterOptions = {};
+
+                if (options && options.fomatterOptions){
+                    _formatterOptions = Object.assign(formatterOptions, options.fomatterOptions);
+                }
+
+                var formattedResult = beautifyCss(sassTreeResult, _formatterOptions);
+
+                return utils.fixFomatterApplyIssue(formattedResult);
             }
 
             return sassTreeResult;
