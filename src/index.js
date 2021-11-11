@@ -67,6 +67,25 @@ const getAttributes = function (attributes, keys) {
 };
 
 /**
+ * Get style contents
+ * 
+ * @param {array} styleElements
+ */
+const getStyleContents = function (styleElements) {
+    return styleElements.map((element) => {
+        let styleContents = element.children.filter((x) => x.type = 'text').map((x) => x.content);
+
+        return {
+            tagName: 'style',
+            text: 'STYLE',
+            attributes: {
+                style: styleContents.join('')
+            }
+        };
+    });
+};
+
+/**
  * Parse given HTML content as JSON
  * 
  * @param {string} htmlJson 
@@ -74,18 +93,18 @@ const getAttributes = function (attributes, keys) {
  * @returns Object
  */
 const parseHtmlJson = function (htmlJson) {
-    if (htmlJson) {
-        var _data = null;
+    if (htmlJson && Array.isArray(htmlJson)) {
+        var _data = htmlJson.filter((x) => x.type == 'element' && x.tagName != 'style'),
+            styleElements = htmlJson.filter((x) => x.tagName == 'style'),
+            styleList = [];
 
-        if (Array.isArray(htmlJson)) {
-            _data = htmlJson.filter((x) => x.type == 'element');
-        } else if (Array.isArray(htmlJson.children)) {
-            _data = htmlJson.children;
+        if (styleElements && styleElements.length) {
+            styleList = getStyleContents(styleElements);
         }
 
-        return _data.map((node, i) => {
+        var elementList = _data.map((node) => {
             if (Array.isArray(node.children)) {
-                let children = parseHtmlJson(node);
+                let children = parseHtmlJson(node.children);
 
                 // find text nodes and merge
                 node.text = children.filter((x) => x.type == 'text').map((x) => {
@@ -103,7 +122,11 @@ const parseHtmlJson = function (htmlJson) {
             node.attributes = getAttributes(node.attributes, ['class', 'style']);
 
             return node.attributes !== null || node.children !== null ? node : null;
-        }).filter((node) => node !== null && node !== undefined);
+        });
+
+        elementList = elementList.filter((node) => node !== null && node !== undefined);
+
+        return [...styleList, ...elementList];
     }
 
     return null;
@@ -119,7 +142,8 @@ const parseHtmlJson = function (htmlJson) {
  */
 const getSassTree = function (nodeTree, count = 0) {
     if (nodeTree) {
-        var _data = null;
+        var _data = null,
+            styleCount = 0;
 
         if (Array.isArray(nodeTree)) {
             _data = nodeTree;
@@ -141,20 +165,31 @@ const getSassTree = function (nodeTree, count = 0) {
                 blocks = getSassTree(node, count);
             }
 
-            if (node.attributes) {
-                block += node.attributes.class ? `@apply ${node.attributes.class};` : '';
+            if (node.tagName == 'style' && node.attributes) {
+                styleCount += 1;
 
-                node.attributes.style = utils.addMissingSuffix(node.attributes.style, ';');
-                block += node.attributes.style ? `\n${node.attributes.style}\n` : '';
-            }
+                var result = `// #region STYLE #${styleCount}\n`;
 
-            if (block.length || blocks.length) {
-                let result = `/* ${node.tagName} -> ${node.text ? node.text : 'NOTEXT'} */`;
-
-                result += `.any-${count}-${node.tagName}`;
-                result += `{${block}/*#block_${node.children ? node.children.length : '-'}*/${blocks}}`;
+                result += `\n${node.attributes.style}\n`;
+                result += '// #endregion\n\n';
 
                 return result;
+            } else {
+                if (node.attributes) {
+                    block += node.attributes.class ? `@apply ${node.attributes.class};` : '';
+
+                    node.attributes.style = utils.addMissingSuffix(node.attributes.style, ';');
+                    block += node.attributes.style ? `\n${node.attributes.style}\n` : '';
+                }
+
+                if (block.length || blocks.length) {
+                    let result = `/* ${node.tagName} -> ${node.text ? node.text : 'NOTEXT'} */`;
+
+                    result += `.any-${count}-${node.tagName}`;
+                    result += `{${block}/*#block_${node.children ? node.children.length : '-'}*/${blocks}}`;
+
+                    return result;
+                }
             }
 
             return null;
