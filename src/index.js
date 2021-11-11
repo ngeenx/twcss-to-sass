@@ -34,6 +34,7 @@ const formatterOptions = {
     indent_empty_lines: false
 };
 
+
 /**
  * Extract target attributes
  * 
@@ -86,13 +87,13 @@ const getStyleContents = function (styleElements) {
 };
 
 /**
- * Parse given HTML content as JSON
+ * Filter given HTML content as JSON
  * 
  * @param {string} htmlJson 
  * 
  * @returns Object
  */
-const parseHtmlJson = function (htmlJson) {
+const filterHtmlData = function (htmlJson) {
     if (htmlJson && Array.isArray(htmlJson)) {
         var _data = htmlJson.filter((x) => x.type == 'element' && x.tagName != 'style'),
             styleElements = htmlJson.filter((x) => x.tagName == 'style'),
@@ -104,7 +105,7 @@ const parseHtmlJson = function (htmlJson) {
 
         var elementList = _data.map((node) => {
             if (Array.isArray(node.children)) {
-                let children = parseHtmlJson(node.children);
+                let children = filterHtmlData(node.children);
 
                 // find text nodes and merge
                 node.text = children.filter((x) => x.type == 'text').map((x) => {
@@ -199,6 +200,7 @@ const getSassTree = function (nodeTree, count = 0) {
     return '';
 };
 
+
 module.exports = {
     /**
      * Convert HMTL to SASS generic method
@@ -211,7 +213,8 @@ module.exports = {
     convertToSass: function (html, options = defaultOptions) {
         if (html && html.length) {
             const htmlJson = parse.parse(utils.cleanText(html)),
-                sassTreeResult = getSassTree(parseHtmlJson(htmlJson));
+                filteredHtmlData = filterHtmlData(htmlJson),
+                sassTreeResult = getSassTree(filteredHtmlData);
 
             if (options && options.formatOutput === true) {
                 var _formatterOptions = {};

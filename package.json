@@ -1,6 +1,6 @@
 {
   "name": "@egoistdeveloper/twcss-to-sass",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "HTML template to SASS converter for TailwindCSS",
   "source": "src/index.js",
   "main": "dist/twcss-to-sass.js",
