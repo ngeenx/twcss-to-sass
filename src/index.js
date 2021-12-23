@@ -93,9 +93,9 @@ const getStyleContents = function (styleElements) {
  * 
  * @returns Object
  */
-const filterHtmlData = function (htmlJson) {
+const filterHtmlData = function (htmlJson, nestedOrder = 1) {
     if (htmlJson && Array.isArray(htmlJson)) {
-        var _data = htmlJson.filter((x) => x.type == 'element' && x.tagName != 'style'),
+        var parentNode = htmlJson.filter((x) => (x.type == 'element' || x.type == 'comment') && x.tagName != 'style'),
             styleElements = htmlJson.filter((x) => x.tagName == 'style'),
             styleList = [];
 
@@ -103,26 +103,45 @@ const filterHtmlData = function (htmlJson) {
             styleList = getStyleContents(styleElements);
         }
 
-        var elementList = _data.map((node) => {
+        var elementList = parentNode.map((node) => {
             if (Array.isArray(node.children)) {
-                let children = filterHtmlData(node.children);
+                var previousNodes = [];
+                
+                // find available previous nodes
+                for (let i = 0; i < parentNode.length; i++) {
+                    if (parentNode[i] == node){
+                        if (parentNode[i - 1]){
+                            previousNodes.push(parentNode[i - 1]);
+                        }
 
-                // find text nodes and merge
-                node.text = children.filter((x) => x.type == 'text').map((x) => {
-                    return utils.cleanText(x.content, true);
-                }).filter((x) => x !== null).join(' ');
+                        if (parentNode[i - 2]){
+                            previousNodes.push(parentNode[i - 2]);
+                        }
 
-                // last cleanup
-                node.text = utils.cleanText(node.text, true);
+                        break;
+                    }
+                }
 
-                // get elements
+                // get parent comment text
+                node.comment = previousNodes.filter((x) => x.type == 'comment')
+                .map((x) => utils.cleanText(x.content, true))
+                .filter((x) => x !== null)
+                .reverse()
+                .join(', ');
+                
+                node.comment = node.comment ? node.comment : node.tagName;
+                node.order = nestedOrder;
+
+                let children = filterHtmlData(node.children, nestedOrder + 1);
+
+                // get only html elements
                 node.children = children.length ? children.filter((x) => x.type == 'element') : null;
             }
 
-            // get specific attributes
+            // get only class and inline style attributes
             node.attributes = getAttributes(node.attributes, ['class', 'style']);
 
-            return node.attributes !== null || node.children !== null ? node : null;
+            return (node.attributes !== null || node.children !== null) ? node : null;
         });
 
         elementList = elementList.filter((node) => node !== null && node !== undefined);
@@ -141,53 +160,48 @@ const filterHtmlData = function (htmlJson) {
  * 
  * @returns string
  */
-const getSassTree = function (nodeTree, count = 0) {
+const getSassTree = function (nodeTree, deepth = 0) {
     if (nodeTree) {
-        var _data = null,
-            styleCount = 0;
+        var styleCount = 0;
 
-        if (Array.isArray(nodeTree)) {
-            _data = nodeTree;
-        } else if (Array.isArray(nodeTree.children)) {
-            _data = nodeTree.children;
+        if (!Array.isArray(nodeTree)) {
+            nodeTree = nodeTree.children;
         }
 
-        return _data.map((node) => {
-            let block = '',
-                blocks = '';
+        return nodeTree.map((node) => {
+            let treeSTring = '',
+                subTreeSTring = '';
 
             if (node.attributes === null && node.children === null) {
                 return '';
             }
 
             if (Array.isArray(node.children) && node.children.length) {
-                ++count;
+                ++deepth;
 
-                blocks = getSassTree(node, count);
+                subTreeSTring = getSassTree(node, deepth);
             }
 
             if (node.tagName == 'style' && node.attributes) {
                 styleCount += 1;
 
-                var result = `// #region STYLE #${styleCount}\n`;
-
+                let result = `// #region STYLE #${styleCount}\n`;
                 result += `\n${node.attributes.style}\n`;
                 result += '// #endregion\n\n';
 
                 return result;
             } else {
                 if (node.attributes) {
-                    block += node.attributes.class ? `@apply ${node.attributes.class};` : '';
+                    treeSTring += node.attributes.class ? `@apply ${node.attributes.class};` : '';
 
                     node.attributes.style = utils.addMissingSuffix(node.attributes.style, ';');
-                    block += node.attributes.style ? `\n${node.attributes.style}\n` : '';
+                    treeSTring += node.attributes.style ? `\n${node.attributes.style}\n` : '';
                 }
 
-                if (block.length || blocks.length) {
-                    let result = `/* ${node.tagName} -> ${node.text ? node.text : 'NOTEXT'} */`;
-
-                    result += `.any-${count}-${node.tagName}`;
-                    result += `{${block}/*#block_${node.children ? node.children.length : '-'}*/${blocks}}`;
+                if (treeSTring.length || subTreeSTring.length) {
+                    let result = `/* ${node.comment} -> ${node.order} */`;
+                    result += `.class-${deepth}-${node.tagName}`;
+                    result += `{${treeSTring}${subTreeSTring}}`;
 
                     return result;
                 }
@@ -216,6 +230,7 @@ module.exports = {
                 filteredHtmlData = filterHtmlData(htmlJson),
                 sassTreeResult = getSassTree(filteredHtmlData);
 
+            // export with formatted output
             if (options && options.formatOutput === true) {
                 var _formatterOptions = {};
 

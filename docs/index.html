@@ -43,7 +43,17 @@
                             TailwindCSS to SASS Converter
                         </v-toolbar-title>
                     </v-col>
-                    <v-col cols="2" class="d-flex justify-end"></v-col>
+                    <v-col cols="2" class="d-flex justify-end">
+                        <a class="github-button mx-10"
+                            href="https://github.com/EgoistDeveloper/twcss-to-sass"
+                            data-color-scheme="no-preference: dark; light: light; dark: dark;"
+                            data-icon="octicon-star"
+                            data-size="large"
+                            data-show-count="true"
+                            aria-label="Star facebook/react on GitHub">
+                            Star
+                        </a>
+                    </v-col>
             </v-toolbar>
 
             <v-main class="my-5 mx-5">
@@ -103,6 +113,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
 
+    <!-- Github Buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
     <!-- App -->
     <script>
         const isBrowserDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -126,7 +139,7 @@
                 /** load monaco code editors */
                 loadEditors: function () {
                     const defaultTemplate =
-                        `<div class="bg-white">\n\t<div class="flex justify-center items-center min-h-screen min-w-full">\n\t\t<div class="flex relative">\n\t\t\t<div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">\n\t\t\t\tMy Text 1\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>`;
+                        `<!-- Container Start -->\n<!-- Container Any -->\n<div class="bg-white">\n\t<!-- Some Div -->\n\t<div class="flex justify-center items-center min-h-screen min-w-full">\n\t\t<div class="flex relative">\n\t\t\t<!-- Inner Div -->\n\t\t\t<div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">\n\t\t\t\tMy Text 1\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n<!-- Container End-->`;
 
                     const {
                         convertToSass
