@@ -1,38 +1,42 @@
 # twcss-to-sass
 HTML template to SASS converter for TailwindCSS
 
-## **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
+## 🚀 **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
 
-## Install 
+
+
+## 📦 Installation
 ```bash
 npm i @egoistdeveloper/twcss-to-sass
 ```
 
-## Browser Example
+## 🔰 Browser Example
 
 ```javascript
 <script src="./twcss-to-sass.js"></script>
 
 <script>
     const { convertToSass } = twcssToSass,
-    html = `<div class="bg-white">
+    html = `<!-- Container Start -->
+            <!-- Container Any -->
+            <div class="bg-white">
+                <!-- Some Div -->
                 <div class="flex justify-center items-center min-h-screen min-w-full">
                     <div class="flex relative">
+                        <!-- Inner Div -->
                         <div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">
                             My Text 1
                         </div>
-                        <div class="w-72 h-40 bg-yellow-400 transform transition-all skew-x-12 -skew-y-12 absolute -top-4 -left-4 rounded-lg">
-                            My Text 2
-                        </div>
                     </div>
                 </div>
-            </div>`;
+            </div>
+            <!-- Container End-->`;
 
     console.log(convertToSass(html));
 </script>
 ```
 
-## NodeJS Example
+## 🔰 NodeJS Example
 
 ```javascript
 const twsToSass = require('./twcss-to-sass');
