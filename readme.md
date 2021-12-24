@@ -66,10 +66,10 @@ npm i @egoistdeveloper/twcss-to-sass
             <!-- Container Any -->
             <div class="bg-white">
                 <!-- Some Div -->
-                <div class="flex justify-center items-center min-h-screen min-w-full">
+                <div class="flex justify-center items-center min-h-screen">
                     <div class="flex relative">
                         <!-- Inner Div -->
-                        <div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">
+                        <div class="w-72 h-40 bg-green-400 absolute">
                             My Text 1
                         </div>
                     </div>
