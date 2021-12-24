@@ -14,7 +14,7 @@ npm i @egoistdeveloper/twcss-to-sass
 
 **Template Input**
 
-```html
+```xml
 <!-- Container Start -->
 <!-- Container Any -->
 <div class="bg-white">
