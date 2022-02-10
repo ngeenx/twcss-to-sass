@@ -1,10 +1,10 @@
 # twcss-to-sass
 HTML template to SASS converter for TailwindCSS
 
-![NPM](https://img.shields.io/npm/v/@egoistdeveloper/twcss-to-sass)
-![NPM Type Definitions](https://img.shields.io/npm/types/@egoistdeveloper/twcss-to-sass)
-![NPM Bundle Size](https://img.shields.io/bundlephobia/minzip/@egoistdeveloper/twcss-to-sass)
-![NPM](https://img.shields.io/npm/l/@egoistdeveloper/twcss-to-sass)
+[![NPM](https://img.shields.io/npm/v/@egoistdeveloper/twcss-to-sass)](https://www.npmjs.com/package/@egoistdeveloper/twcss-to-sass)
+[![NPM Type Definitions](https://img.shields.io/npm/types/@egoistdeveloper/twcss-to-sass)](https://www.npmjs.com/package/@egoistdeveloper/twcss-to-sass)
+[![NPM Bundle Size](https://img.shields.io/bundlephobia/minzip/@egoistdeveloper/twcss-to-sass)](https://www.npmjs.com/package/@egoistdeveloper/twcss-to-sass)
+[![NPM](https://img.shields.io/npm/l/@egoistdeveloper/twcss-to-sass)](https://github.com/EgoistDeveloper/twcss-to-sass/blob/dev/LICENSE)
 
 ## 🚀 Demo
 
