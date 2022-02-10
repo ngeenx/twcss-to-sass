@@ -6,15 +6,23 @@ HTML template to SASS converter for TailwindCSS
 [![NPM Bundle Size](https://img.shields.io/bundlephobia/minzip/@egoistdeveloper/twcss-to-sass)](https://www.npmjs.com/package/@egoistdeveloper/twcss-to-sass)
 [![NPM](https://img.shields.io/npm/l/@egoistdeveloper/twcss-to-sass)](https://github.com/EgoistDeveloper/twcss-to-sass/blob/dev/LICENSE)
 
-## 🚀 Demo
-
-### **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
+## 🚀 **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
 
 
 ## 📦 Installation
-```bash
+
+### NPM
+
+```dsconfig
 npm i @egoistdeveloper/twcss-to-sass
 ```
+
+### CDN
+
+```javascript
+<script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@2.0.0/dist/umd/index.js"></script>
+```
+
 
 ## Input-Output
 
@@ -63,8 +71,14 @@ npm i @egoistdeveloper/twcss-to-sass
 
 ## 🔰 Browser Example
 
-```javascript
-<script src="./twcss-to-sass.js"></script>
+```html
+<!-- local -->
+<script src="./../../dist/umd/index.js"></script>
+
+<!-- or -->
+
+<!-- CDN -->
+<script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@2.0.0/dist/umd/index.js"></script>
 
 <script>
     const { convertToSass } = TwCssToSass,
