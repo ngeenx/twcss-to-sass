@@ -20,7 +20,7 @@ npm i @egoistdeveloper/twcss-to-sass
 ### CDN
 
 ```javascript
-<script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@2.0.0/dist/umd/index.js"></script>
+<script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/umd/index.js"></script>
 ```
 
 
@@ -78,7 +78,7 @@ npm i @egoistdeveloper/twcss-to-sass
 <!-- or -->
 
 <!-- CDN -->
-<script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@2.0.0/dist/umd/index.js"></script>
+<script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/umd/index.js"></script>
 
 <script>
     const { convertToSass } = TwCssToSass,
