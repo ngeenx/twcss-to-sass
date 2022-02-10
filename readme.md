@@ -1,4 +1,6 @@
 # twcss-to-sass
+[![EgoistDeveloper twCss-to-sass](https://preview.dragon-code.pro/EgoistDeveloper/twCss-to-sass.svg)](https://github.com/EgoistDeveloper/twcss-to-sass)
+
 HTML template to SASS converter for TailwindCSS
 
 [![NPM](https://img.shields.io/npm/v/@egoistdeveloper/twcss-to-sass)](https://www.npmjs.com/package/@egoistdeveloper/twcss-to-sass)
