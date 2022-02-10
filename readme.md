@@ -1,8 +1,14 @@
 # twcss-to-sass
 HTML template to SASS converter for TailwindCSS
 
-## 🚀 **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
+![NPM](https://img.shields.io/npm/v/@egoistdeveloper/twcss-to-sass)
+![NPM Type Definitions](https://img.shields.io/npm/types/@egoistdeveloper/twcss-to-sass)
+![NPM Bundle Size](https://img.shields.io/bundlephobia/minzip/@egoistdeveloper/twcss-to-sass)
+![NPM](https://img.shields.io/npm/l/@egoistdeveloper/twcss-to-sass)
 
+## 🚀 Demo
+
+### **[Demo](https://egoistdeveloper.github.io/twcss-to-sass/)**
 
 
 ## 📦 Installation
@@ -61,7 +67,7 @@ npm i @egoistdeveloper/twcss-to-sass
 <script src="./twcss-to-sass.js"></script>
 
 <script>
-    const { convertToSass } = twcssToSass,
+    const { convertToSass } = TwCssToSass,
     html = `<!-- Container Start -->
             <!-- Container Any -->
             <div class="bg-white">
@@ -84,12 +90,23 @@ npm i @egoistdeveloper/twcss-to-sass
 ## 🔰 NodeJS Example
 
 ```javascript
-const twsToSass = require('./twcss-to-sass');
+const TwCssToSass = require('./twcss-to-sass');
 const path = require('path');
 const fs = require('fs');
 
 const htmlContent = fs.readFileSync(path.resolve(__dirname, './../../src/data/mock3.html'), 'UTF-8');
 
-console.log(twsToSass.convertToSass(htmlContent));
+console.log(TwCssToSass.convertToSass(htmlContent));
+
+```
+
+## 🔰 Angular, React, Vue, etc...
+
+```javascript
+import { convertToSass } from '@egoistdeveloper/twcss-to-sass';
+
+const htmlContent = '<div class="w-72 h-40 bg-green-400 transform transition-all">My Text 1</div>';
+
+console.log(convertToSass(htmlContent));
 
 ```
