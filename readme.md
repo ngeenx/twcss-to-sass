@@ -108,7 +108,10 @@ const TwCssToSass = require('./twcss-to-sass');
 const path = require('path');
 const fs = require('fs');
 
-const htmlContent = fs.readFileSync(path.resolve(__dirname, './../../src/data/mock3.html'), 'UTF-8');
+const htmlContent = fs.readFileSync(
+  path.resolve(__dirname, './templates/template-1.html'),
+  'UTF-8'
+)
 
 console.log(TwCssToSass.convertToSass(htmlContent));
 
