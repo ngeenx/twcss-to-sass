@@ -129,3 +129,7 @@ const htmlContent = '<div class="w-72 h-40 bg-green-400 transform transition-all
 console.log(convertToSass(htmlContent));
 
 ```
+
+## Attribution
+
+<a href="https://www.flaticon.com/free-icons/wind" title="wind icons">Wind icons created by smalllikeart - Flaticon</a>

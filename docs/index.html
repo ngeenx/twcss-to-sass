@@ -6,6 +6,8 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
+    <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
+
     <!-- Roboto Font -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
 
@@ -28,6 +30,10 @@
         .code-container {
             height: 500px;
             width: 100%;
+        }
+
+        .splitter {
+          margin: 50px 10px;
         }
     </style>
 </head>
@@ -58,7 +64,9 @@
 
             <v-main class="my-5 mx-5">
                 <v-container fluid>
-                    <v-row>
+                  <vue-splitter v-on:resize="onSplitterResize()" class="mx-auto">
+                    <div slot="left-pane" class="overflow-hidden">
+                      <v-row>
                         <v-col cols="12">
                             <v-row>
                                 <v-col>
@@ -72,8 +80,10 @@
                             </v-row>
                         </v-col>
                     </v-row>
+                    </div>
 
-                    <v-row>
+                    <div slot="right-pane" class="overflow-hidden">
+                      <v-row>
                         <v-col cols="12">
                             <v-row>
                                 <v-col>
@@ -87,6 +97,8 @@
                             </v-row>
                         </v-col>
                     </v-row>
+                    </div>
+                  </vue-splitter>
                 </v-container>
             </v-main>
         </v-app>
@@ -94,6 +106,9 @@
 
     <!-- VueJS -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+
+    <!-- @rmp135/vue-splitter -->
+    <script src="https://unpkg.com/@rmp135/vue-splitter@1.4.0/dist/vue-splitter.js"></script>
 
     <!-- Vuetify -->
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
@@ -128,6 +143,10 @@
                     dark: isBrowserDarkTheme
                 },
             }),
+
+            components: {
+              VueSplitter
+            },
 
             data: {
                 htmlInput: null,
@@ -208,7 +227,12 @@
 
                         this.$vuetify.theme.isDark = e.matches;
                     });
-                }
+                },
+
+                onSplitterResize: function(){
+                    htmlMonacoEditor.layout();
+                    sassMonacoEditor.layout();
+                },
             },
 
             mounted: function () {
