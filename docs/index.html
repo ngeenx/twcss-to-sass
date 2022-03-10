@@ -28,7 +28,7 @@
         }
 
         .code-container {
-            height: 500px;
+            height: 80vh;
             width: 100%;
         }
 
@@ -42,14 +42,18 @@
     <div id="app">
         <v-app v-cloak>
             <!-- Navbar -->
-            <v-toolbar class="pa-0">
+            <v-toolbar class="pa-0" style="max-height: 65px;">
                 <v-row>
                     <v-col cols="2"></v-col>
+
                     <v-col class="d-flex justify-space-around">
-                        <v-toolbar-title>
+                      <v-toolbar-title>
+                          <img src="./assets/favicon.png" height="20" width="20" alt="Logo">
+
                             TailwindCSS to SASS Converter
                         </v-toolbar-title>
                     </v-col>
+
                     <v-col cols="2" class="d-flex justify-end">
                         <a class="github-button mx-10"
                             href="https://github.com/EgoistDeveloper/twcss-to-sass"
