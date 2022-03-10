@@ -41,6 +41,7 @@
 <body>
     <div id="app">
         <v-app v-cloak>
+            <!-- Navbar -->
             <v-toolbar class="pa-0">
                 <v-row>
                     <v-col cols="2"></v-col>
@@ -62,41 +63,51 @@
                     </v-col>
             </v-toolbar>
 
-            <v-main class="my-5 mx-5">
+            <!-- Main Container -->
+            <v-main class="my-3">
                 <v-container fluid>
+                  <!-- Splitter Container -->
                   <vue-splitter v-on:resize="onSplitterResize()" class="mx-auto">
+                    <!-- Source Pane -->
                     <div slot="left-pane" class="overflow-hidden">
                       <v-row>
                         <v-col cols="12">
+                            <!-- Title -->
                             <v-row>
                                 <v-col>
                                     Tailwind template (HTML format)
                                 </v-col>
                             </v-row>
+
+                            <!-- Editor -->
                             <v-row>
                                 <v-col>
                                     <div id="htmlContainer" class="code-container"></div>
                                 </v-col>
                             </v-row>
                         </v-col>
-                    </v-row>
+                      </v-row>
                     </div>
 
+                    <!-- Output Pane -->
                     <div slot="right-pane" class="overflow-hidden">
                       <v-row>
                         <v-col cols="12">
+                            <!-- Title -->
                             <v-row>
                                 <v-col>
                                     SASS Output
                                 </v-col>
                             </v-row>
+
+                            <!-- Editor -->
                             <v-row>
                                 <v-col>
                                     <div id="sassContainer" class="code-container"></div>
                                 </v-col>
                             </v-row>
                         </v-col>
-                    </v-row>
+                      </v-row>
                     </div>
                   </vue-splitter>
                 </v-container>
