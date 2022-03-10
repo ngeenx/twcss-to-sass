@@ -1,6 +1,11 @@
-import { IFormatterOptions } from './formatter-options'
+import { CSSBeautifyOptions } from 'js-beautify'
+import { IClassNameOptions } from './classname-options'
 
 export interface ITwToSassOptions {
   formatOutput: boolean
-  fomatterOptions: IFormatterOptions | null
+  formatterOptions: CSSBeautifyOptions
+  printComments: boolean
+  useCommentBlocksAsClassName: boolean
+  maxClassNameLength: number
+  classNameOptions: IClassNameOptions
 }

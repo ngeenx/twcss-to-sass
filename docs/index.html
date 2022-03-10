@@ -100,6 +100,7 @@
 
     <!-- twcss-to-sass -->
     <script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/umd/index.js"></script>
+    <!-- <script src="../dist/umd/index.js"></script> -->
 
     <!-- Monaco Editor -->
     <script>
@@ -143,13 +144,25 @@
 
                     const {
                         convertToSass
-                    } = TwCssToSass,
-                    theme = this.getCurrentTheme(),
+                    } = TwCssToSass;
+
+                    const theme = this.getCurrentTheme(),
                         commonEditorConfig = {
                             theme: `vs-${theme}`,
                             minimap: {
                                 enabled: false
                             }
+                        };
+
+                    const converterConfigs = {
+                          useCommentBlocksAsClassName: true,
+                          printComments: true,
+                          classNameOptions: {
+                            lowercase: true,
+                            replaceWith: '-',
+                            prefix: '',
+                            suffix: ''
+                          }
                         };
 
                     htmlMonacoEditor = monaco.editor.create(document.getElementById('htmlContainer'), Object
@@ -163,10 +176,10 @@
                             language: 'scss',
                         }));
 
-                    sassMonacoEditor.getModel().setValue(convertToSass(defaultTemplate));
+                    sassMonacoEditor.getModel().setValue(convertToSass(defaultTemplate, converterConfigs));
 
                     htmlMonacoEditor.onDidChangeModelContent(function (e) {
-                        let sassOutput = convertToSass(htmlMonacoEditor.getValue());
+                        let sassOutput = convertToSass(htmlMonacoEditor.getValue(), converterConfigs);
 
                         if (!sassOutput || !sassOutput.length) {
                             sassOutput = 'Invalid HTML content.';

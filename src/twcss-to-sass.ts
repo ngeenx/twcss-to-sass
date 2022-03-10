@@ -1,9 +1,9 @@
 import { parse } from 'himalaya'
-import beautifyCss from 'js-beautify'
+import beautifyCss, { CSSBeautifyOptions } from 'js-beautify'
+import slug from 'slug'
 
 import Utils from './utils/utils'
 import { ITwToSassOptions } from './interfaces/tw-to-sass-options'
-import { IFormatterOptions } from './interfaces/formatter-options'
 import {
   IAttribute,
   IHtmlNode,
@@ -11,34 +11,33 @@ import {
 } from './interfaces/html-node'
 
 /**
- * Default options
- */
-const defaultOptions: ITwToSassOptions = {
-  formatOutput: true,
-  fomatterOptions: null,
-}
-
-/**
  * Default js-beautify css formatter options
  */
-const formatterOptions: IFormatterOptions = {
-  indent_size: '4',
+const formatterOptions: CSSBeautifyOptions = {
+  indent_size: 4,
   indent_char: ' ',
   max_preserve_newlines: 5,
   preserve_newlines: true,
-  keep_array_indentation: false,
-  break_chained_methods: false,
-  indent_scripts: 'normal',
-  brace_style: 'collapse',
-  space_before_conditional: true,
-  unescape_strings: false,
-  jslint_happy: false,
   end_with_newline: false,
-  wrap_line_length: '0',
-  indent_inner_html: false,
-  comma_first: false,
-  e4x: false,
+  wrap_line_length: 0,
   indent_empty_lines: false,
+}
+
+/**
+ * Default options
+ */
+let defaultOptions: ITwToSassOptions = {
+  formatOutput: true,
+  useCommentBlocksAsClassName: false,
+  maxClassNameLength: 50,
+  printComments: true,
+  formatterOptions: formatterOptions,
+  classNameOptions: {
+    lowercase: true,
+    replaceWith: '-',
+    prefix: '',
+    suffix: '',
+  },
 }
 
 /**
@@ -157,7 +156,6 @@ const filterHtmlData = function (
             .reverse()
             .join(', ')
 
-          node.comment = node.comment ? node.comment : node.tagName
           node.order = nestedOrder
 
           const children: IHtmlNode[] | null = filterHtmlData(
@@ -190,6 +188,46 @@ const filterHtmlData = function (
   }
 
   return null
+}
+
+/**
+ * Get CSS class name from node details
+ *
+ * @param node IHtmlNode
+ * @param deepth number
+ *
+ * @returns string
+ */
+const getClassName = function (node: IHtmlNode, deepth: number): string {
+  let className = ''
+
+  const classComment = defaultOptions.printComments
+    ? `/* ${node.comment ? node.comment : node.tagName} -> ${node.order} */`
+    : ''
+
+  if (node.comment && defaultOptions.useCommentBlocksAsClassName) {
+    let classSlug = defaultOptions.classNameOptions.prefix
+
+    classSlug += slug(node.comment, {
+      lower: !!defaultOptions.classNameOptions.lowercase,
+      replacement: defaultOptions.classNameOptions.replaceWith,
+    })
+
+    classSlug =
+      classSlug.length > defaultOptions.maxClassNameLength
+        ? classSlug.substring(0, defaultOptions.maxClassNameLength)
+        : classSlug
+
+    classSlug += defaultOptions.classNameOptions.suffix
+
+    className += `.${classSlug}`
+  } else if (node.tagName != 'div') {
+    className += `${node.tagName}`
+  } else {
+    className += `.class-${node.tagName}-${deepth}`
+  }
+
+  return classComment + className
 }
 
 /**
@@ -251,8 +289,8 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
           }
 
           if (treeSTring.length || subTreeSTring.length) {
-            let result = `/* ${node.comment} -> ${node.order} */`
-            result += `.class-${deepth}-${node.tagName}`
+            let result = getClassName(node, deepth)
+
             result += `{${treeSTring}${subTreeSTring}}`
 
             return result
@@ -277,9 +315,16 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
  */
 export const convertToSass = function (
   html: string,
-  options: ITwToSassOptions = defaultOptions
+  options: ITwToSassOptions | null = null
 ): null | string {
   if (html && html.length) {
+    if (options) {
+      defaultOptions = {
+        ...defaultOptions,
+        ...options,
+      }
+    }
+
     html = Utils.cleanText(html)
 
     const htmlJson: IHtmlNode[] | IHtmlNode = parse(html)
@@ -290,19 +335,10 @@ export const convertToSass = function (
       const sassTreeResult = getSassTree(filteredHtmlData)
 
       // export with formatted output
-      if (options && options.formatOutput === true) {
-        let _formatterOptions = {}
-
-        if (options && options.fomatterOptions) {
-          _formatterOptions = Object.assign(
-            formatterOptions,
-            options.fomatterOptions
-          )
-        }
-
+      if (defaultOptions.formatOutput === true) {
         const formattedResult = beautifyCss.css(
           sassTreeResult,
-          _formatterOptions
+          defaultOptions.formatterOptions
         )
 
         return Utils.fixFomatterApplyIssue(formattedResult)
