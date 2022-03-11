@@ -33,7 +33,7 @@
         }
 
         .splitter {
-          margin: 50px 10px 0px;
+          margin: 65px 10px 0px;
         }
     </style>
 </head>
@@ -76,30 +76,31 @@
                     <div slot="left-pane" class="overflow-hidden">
                       <v-row>
                         <v-col cols="12">
-                            <!-- Title -->
-                            <v-row>
-                                <v-col>
-                                  Tailwind template (HTML format)
-                                </v-col>
-                            </v-row>
+                            <v-card>
+                              <!-- Title -->
+                              <v-card-title primary-title class="justify-center">
+                                <div>
+                                  <h5 class="amber--text text--accent-2">
+                                    TailwindCSS HTML Template
+                                  </h5>
+                                </div>
+                              </v-card-title>
 
-                            <!-- Editor Tabs -->
-                            <v-row>
-                                <v-col>
-                                  <v-tabs v-model="inputTabModel">
-                                    <v-tab href="#inputHtmlTab">
-                                      HTML
-                                    </v-tab>
-                                  </v-tabs>
+                              <v-divider></v-divider>
 
-                                  <v-tabs-items v-model="inputTabModel">
-                                    <!-- Input HMTL Editor -->
-                                    <v-tab-item :key="1" value="inputHtmlTab">
-                                      <div id="inputHtmlEditorContainer" class="code-container"></div>
-                                    </v-tab-item>
-                                  </v-tabs-items>
-                                </v-col>
-                            </v-row>
+                              <v-tabs v-model="inputTabModel">
+                                <v-tab href="#inputHtmlTab" @click="onInputTabSwitch('inputHtmlTab')">
+                                  HTML
+                                </v-tab>
+                              </v-tabs>
+
+                              <v-tabs-items v-model="inputTabModel">
+                                <!-- Input HMTL Editor -->
+                                <v-tab-item :key="1" value="inputHtmlTab" :eager="true">
+                                  <div id="inputHtmlEditorContainer" class="code-container"></div>
+                                </v-tab-item>
+                              </v-tabs-items>
+                            </v-card>
                         </v-col>
                       </v-row>
                     </div>
@@ -108,39 +109,40 @@
                     <div slot="right-pane" class="overflow-hidden">
                       <v-row>
                         <v-col cols="12">
-                          <!-- Title -->
-                            <v-row>
-                                <v-col>
-                                    SASS Output
-                                </v-col>
-                            </v-row>
+                          <v-card>
+                            <!-- Title -->
+                            <v-card-title primary-title class="justify-center">
+                              <div>
+                                <h5 class="amber--text text--accent-2">
+                                  Output
+                                </h5>
+                              </div>
+                            </v-card-title>
 
-                            <!-- Editor Tabs -->
-                            <v-row>
-                                <v-col>
-                                  <v-tabs v-model="outputTabModel">
-                                    <v-tab href="#outputHtmlTab">
-                                      HTML
-                                    </v-tab>
+                            <v-divider></v-divider>
 
-                                    <v-tab href="#outputSassTab">
-                                      SASS
-                                    </v-tab>
-                                  </v-tabs>
+                            <v-tabs v-model="outputTabModel">
+                              <v-tab href="#outputHtmlTab" @click="onOutputTabSwitch('outputHtmlTab')">
+                                HTML
+                              </v-tab>
 
-                                  <v-tabs-items v-model="outputTabModel">
-                                    <!-- Output HMTL Editor -->
-                                    <v-tab-item :key="1" value="outputHtmlTab">
-                                      <div id="outputHtmlEditorContainer" class="code-container"></div>
-                                    </v-tab-item>
+                              <v-tab href="#outputSassTab" @click="onOutputTabSwitch('outputSassTab')">
+                                SASS
+                              </v-tab>
+                            </v-tabs>
 
-                                    <!-- Output SASS Editor -->
-                                    <v-tab-item :key="2" value="outputSassTab">
-                                      <div id="outputSassEditorContainer" class="code-container"></div>
-                                    </v-tab-item>
-                                  </v-tabs-items>
-                                </v-col>
-                            </v-row>
+                            <v-tabs-items v-model="outputTabModel">
+                              <!-- Output HMTL Editor -->
+                              <v-tab-item :key="1" value="outputHtmlTab" :eager="true">
+                                <div id="outputHtmlEditorContainer" class="code-container"></div>
+                              </v-tab-item>
+
+                              <!-- Output SASS Editor -->
+                              <v-tab-item :key="2" value="outputSassTab" :eager="true">
+                                <div id="outputSassEditorContainer" class="code-container"></div>
+                              </v-tab-item>
+                            </v-tabs-items>
+                          </v-card>
                         </v-col>
                       </v-row>
                     </div>
@@ -199,8 +201,8 @@
                 sassOutput: null,
                 htmlMonacoEditor: null,
                 outputSassMonacoEditor: null,
-                inputTabModel: 1,
-                outputTabModel: 'outputSassTab'
+                inputTabModel: null,
+                outputTabModel: null
             },
 
             methods: {
@@ -232,23 +234,35 @@
                           }
                         };
 
-                    // Input HTML Editor
+                    //#region Input Editors
+
                     inputHtmlMonacoEditor = monaco.editor.create(document.getElementById('inputHtmlEditorContainer'), Object
                         .assign(commonEditorConfig, {
                             value: defaultTemplate,
                             language: 'html',
                         }));
 
-
                     inputHtmlMonacoEditor.onDidChangeModelContent(function (e) {
-                        let sassOutput = convertToSass(inputHtmlMonacoEditor.getValue(), converterConfigs);
+                        let convertResult = convertToSass(inputHtmlMonacoEditor.getValue(), converterConfigs);
 
-                        if (!sassOutput || !sassOutput.length) {
-                            sassOutput = 'Invalid HTML content.';
+                        if (!convertResult || !convertResult.length) {
+                          convertResult = 'Invalid HTML content.';
                         }
 
-                        outputSassMonacoEditor.getModel().setValue(sassOutput);
+                        outputHtmlMonacoEditor.getModel().setValue(convertResult.html);
+                        outputSassMonacoEditor.getModel().setValue(convertResult.sass);
                     });
+
+                    //#endregion
+
+
+                    //#region Output Editors
+
+                    outputHtmlMonacoEditor = monaco.editor.create(document.getElementById('outputHtmlEditorContainer'), Object
+                      .assign(commonEditorConfig, {
+                          value: '',
+                          language: 'html',
+                      }));
 
                     // Output SASS Editor
                     outputSassMonacoEditor = monaco.editor.create(document.getElementById('outputSassEditorContainer'), Object
@@ -256,8 +270,12 @@
                             language: 'scss',
                         }));
 
-                    outputSassMonacoEditor.getModel().setValue(convertToSass(defaultTemplate, converterConfigs));
+                    let convertResult = convertToSass(defaultTemplate, converterConfigs);
 
+                    outputHtmlMonacoEditor.getModel().setValue(convertResult.html);
+                    outputSassMonacoEditor.getModel().setValue(convertResult.sass);
+
+                    //#endregion
                 },
 
                 /** get current browser theme */
@@ -275,15 +293,40 @@
                         };
 
                         inputHtmlMonacoEditor.updateOptions(themeOption);
+
+                        outputHtmlMonacoEditor.updateOptions(themeOption);
                         outputSassMonacoEditor.updateOptions(themeOption);
 
                         this.$vuetify.theme.isDark = e.matches;
                     });
                 },
 
+                /** resize editors on splitter position change */
                 onSplitterResize: function(){
                   inputHtmlMonacoEditor.layout();
-                    outputSassMonacoEditor.layout();
+
+                  outputHtmlMonacoEditor.layout();
+                  outputSassMonacoEditor.layout();
+                },
+
+                /** resize editors on input tabs switch */
+                onInputTabSwitch: function(tab) {
+                  setTimeout(() => {
+                    if (tab == 'inputHtmlTab') {
+                      inputHtmlMonacoEditor.layout();
+                    }
+                  }, 250);
+                },
+
+                /** resize editors on output tabs switch */
+                onOutputTabSwitch: function(tab){
+                  setTimeout(() => {
+                    if (tab == 'outputHtmlTab') {
+                      outputHtmlMonacoEditor.layout();
+                    } else if (tab == 'outputSassTab') {
+                      outputSassMonacoEditor.layout();
+                    }
+                  }, 250);
                 },
             },
 
@@ -291,7 +334,7 @@
               setTimeout(() => {
                 this.loadEditors();
                 this.watchBrowserTheme();
-              }, 500);
+              }, 250);
             }
         });
     </script>
