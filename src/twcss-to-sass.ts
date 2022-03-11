@@ -29,7 +29,7 @@ const formatterOptions: CSSBeautifyOptions = {
  */
 let defaultOptions: ITwToSassOptions = {
   formatOutput: true,
-  useCommentBlocksAsClassName: false,
+  useCommentBlocksAsClassName: true,
   maxClassNameLength: 50,
   printComments: true,
   formatterOptions: formatterOptions,
@@ -40,6 +40,9 @@ let defaultOptions: ITwToSassOptions = {
     suffix: '',
   },
 }
+
+let _defaultOptions: ITwToSassOptions = defaultOptions
+
 
 /**
  * Get style and class attributes
@@ -202,20 +205,20 @@ const filterHtmlData = function (
 const getClassName = function (node: IHtmlNode, deepth: number): string {
   let className = ''
 
-  if (node.comment && defaultOptions.useCommentBlocksAsClassName) {
-    let classSlug = defaultOptions.classNameOptions.prefix
+  if (node.comment && _defaultOptions.useCommentBlocksAsClassName) {
+    let classSlug = _defaultOptions.classNameOptions.prefix
 
     classSlug += slug(node.comment, {
-      lower: !!defaultOptions.classNameOptions.lowercase,
-      replacement: defaultOptions.classNameOptions.replaceWith,
+      lower: !!_defaultOptions.classNameOptions.lowercase,
+      replacement: _defaultOptions.classNameOptions.replaceWith,
     })
 
     classSlug =
-      classSlug.length > defaultOptions.maxClassNameLength
-        ? classSlug.substring(0, defaultOptions.maxClassNameLength)
+      classSlug.length > _defaultOptions.maxClassNameLength
+        ? classSlug.substring(0, _defaultOptions.maxClassNameLength)
         : classSlug
 
-    classSlug += defaultOptions.classNameOptions.suffix
+    classSlug += _defaultOptions.classNameOptions.suffix
 
     className = classSlug
   } else if (node.tagName != 'div') {
@@ -286,7 +289,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
           }
 
           if (treeString.length || subTreeString.length) {
-            const classComment = defaultOptions.printComments
+            const classComment = _defaultOptions.printComments
               ? `/* ${node.comment ? node.comment : node.tagName} -> ${
                   node.order
                 } */`
@@ -330,8 +333,8 @@ const getHtmlTree = function (
       if (node.type == 'element') {
         const className = getClassName(node, deepth)
 
-        if (defaultOptions.printComments) {
-          if (node.comment){
+        if (_defaultOptions.printComments) {
+          if (node.comment) {
             openTags += `<!-- ${node.comment.trim()} -->`
           }
         }
@@ -362,11 +365,11 @@ const getHtmlTree = function (
  */
 export const convertToSass = function (
   html: string,
-  options: ITwToSassOptions | null = null
+  options: ITwToSassOptions | null = defaultOptions
 ): null | IConverterResult {
   if (html && html.length) {
     if (options) {
-      defaultOptions = {
+      _defaultOptions = {
         ...defaultOptions,
         ...options,
       }
@@ -386,12 +389,12 @@ export const convertToSass = function (
       }
 
       // export with formatted output
-      if (defaultOptions.formatOutput === true) {
+      if (_defaultOptions.formatOutput === true) {
         const formattedHtmlResult = beautifyCss.html(htmlTreeResult)
 
         const formattedSassResult = beautifyCss.css(
           sassTreeResult,
-          defaultOptions.formatterOptions
+          _defaultOptions.formatterOptions
         )
 
         return {
