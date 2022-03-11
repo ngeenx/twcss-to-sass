@@ -86,20 +86,18 @@
                             <!-- Editor Tabs -->
                             <v-row>
                                 <v-col>
-                                    <v-col>
-                                      <v-tabs v-model="inputTabModel">
-                                        <v-tab href="#inputHtmlTab">
-                                          HTML
-                                        </v-tab>
-                                      </v-tabs>
+                                  <v-tabs v-model="inputTabModel">
+                                    <v-tab href="#inputHtmlTab">
+                                      HTML
+                                    </v-tab>
+                                  </v-tabs>
 
-                                      <v-tabs-items v-model="inputTabModel">
-                                        <!-- Input HMTL Editor -->
-                                        <v-tab-item :key="1" value="inputHtmlTab">
-                                          <div id="inputHtmlEditorContainer" class="code-container"></div>
-                                        </v-tab-item>
-                                      </v-tabs-items>
-                                    </v-col>
+                                  <v-tabs-items v-model="inputTabModel">
+                                    <!-- Input HMTL Editor -->
+                                    <v-tab-item :key="1" value="inputHtmlTab">
+                                      <div id="inputHtmlEditorContainer" class="code-container"></div>
+                                    </v-tab-item>
+                                  </v-tabs-items>
                                 </v-col>
                             </v-row>
                         </v-col>
