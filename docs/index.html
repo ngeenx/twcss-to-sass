@@ -243,14 +243,10 @@
                         }));
 
                     inputHtmlMonacoEditor.onDidChangeModelContent(function (e) {
-                        let convertResult = convertToSass(inputHtmlMonacoEditor.getValue(), converterConfigs);
+                        let converterResult = convertToSass(inputHtmlMonacoEditor.getValue(), converterConfigs);
 
-                        if (!convertResult || !convertResult.length) {
-                          convertResult = 'Invalid HTML content.';
-                        }
-
-                        outputHtmlMonacoEditor.getModel().setValue(convertResult.html);
-                        outputSassMonacoEditor.getModel().setValue(convertResult.sass);
+                        outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
+                        outputSassMonacoEditor.getModel().setValue(converterResult.sass);
                     });
 
                     //#endregion
@@ -270,10 +266,10 @@
                             language: 'scss',
                         }));
 
-                    let convertResult = convertToSass(defaultTemplate, converterConfigs);
+                    let converterResult = convertToSass(defaultTemplate, converterConfigs);
 
-                    outputHtmlMonacoEditor.getModel().setValue(convertResult.html);
-                    outputSassMonacoEditor.getModel().setValue(convertResult.sass);
+                    outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
+                    outputSassMonacoEditor.getModel().setValue(converterResult.sass);
 
                     //#endregion
                 },
