@@ -27,7 +27,7 @@ const formatterOptions: CSSBeautifyOptions = {
 /**
  * Default options
  */
-let defaultOptions: ITwToSassOptions = {
+const defaultOptions: ITwToSassOptions = {
   formatOutput: true,
   useCommentBlocksAsClassName: true,
   maxClassNameLength: 50,
@@ -42,7 +42,6 @@ let defaultOptions: ITwToSassOptions = {
 }
 
 let _defaultOptions: ITwToSassOptions = defaultOptions
-
 
 /**
  * Get style and class attributes
@@ -220,11 +219,11 @@ const getClassName = function (node: IHtmlNode, deepth: number): string {
 
     classSlug += _defaultOptions.classNameOptions.suffix
 
-    className = classSlug
+    className = '.' + classSlug
   } else if (node.tagName != 'div') {
     className = `${node.tagName}`
   } else {
-    className = `class-${node.tagName}-${deepth}`
+    className = `.class-${node.tagName}-${deepth}`
   }
 
   return className
@@ -297,7 +296,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
 
             const className = getClassName(node, deepth)
 
-            return `${classComment}.${className}{${treeString}${subTreeString}}`
+            return `${classComment}${className}{${treeString}${subTreeString}}`
           }
         }
 
@@ -335,17 +334,28 @@ const getHtmlTree = function (
 
         if (_defaultOptions.printComments) {
           if (node.comment) {
-            openTags += `<!-- ${node.comment.trim()} -->`
+            openTags += `\n<!-- ${node.comment.trim()} -->`
           }
         }
 
-        openTags += `<${node.tagName} class="${className}">`
-
-        if (Array.isArray(node.children) && node.children.length) {
-          openTags += getHtmlTree(node, deepth + 1)
+        if (className.indexOf('.') > -1) {
+          openTags += `\n<${node.tagName} class="${className.replace(
+            '.',
+            ''
+          )}">`
+        } else {
+          openTags += `\n<${node.tagName}>`
         }
 
-        closeTags += `</${node.tagName}>`
+        if (node.children.length) {
+          openTags += getHtmlTree(node, deepth + 1)
+
+          closeTags += `</${node.tagName}>`
+        } else if (node.children.length == 0) {
+          openTags += `</${node.tagName}>`
+        } else {
+          closeTags += `</${node.tagName}>`
+        }
       }
     })
 
