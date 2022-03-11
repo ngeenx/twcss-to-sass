@@ -112,7 +112,9 @@ test('convert to sass for html', () => {
   const htmlOutput = `<!-- Container Start, Container Any -->
 <div class="container-start-container-any">
     <!-- Some Div -->
-    <div class="some-div"></div>
+    <div class="some-div">
+        ...
+    </div>
 </div>`
 
   const converterConfigs = <any>{

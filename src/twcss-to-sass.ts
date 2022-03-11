@@ -325,8 +325,7 @@ const getHtmlTree = function (
       nodeTree = nodeTree.children
     }
 
-    let openTags = '',
-      closeTags = ''
+    let htmlTree = ''
 
     nodeTree.forEach(function (node: IHtmlNode) {
       if (node.type == 'element') {
@@ -334,32 +333,50 @@ const getHtmlTree = function (
 
         if (_defaultOptions.printComments) {
           if (node.comment) {
-            openTags += `\n<!-- ${node.comment.trim()} -->`
+            htmlTree += `\n<!-- ${node.comment.trim()} -->`
           }
         }
 
+        // other attributes
+        const attributes = node.attributes
+          ?.filter(
+            (attribute) =>
+              attribute.key !== 'class' && attribute.key !== 'style'
+          )
+          ?.map((attribute) => `${attribute.key}="${attribute.value}"`)
+          ?.join('')
+
+        // open tag
         if (className.indexOf('.') > -1) {
-          openTags += `\n<${node.tagName} class="${className.replace(
-            '.',
-            ''
-          )}">`
+          const _className = className.replace('.', '')
+
+          htmlTree += `\n<${node.tagName} class="${_className}" ${attributes}>`
         } else {
-          openTags += `\n<${node.tagName}>`
+          htmlTree += `\n<${node.tagName} ${attributes}>`
         }
 
-        if (node.children.length) {
-          openTags += getHtmlTree(node, deepth + 1)
+        const innerText = node.children
+          ?.filter((child) => child.type === 'text')
+          .map((child) => child.content)
+          .join('')
 
-          closeTags += `</${node.tagName}>`
-        } else if (node.children.length == 0) {
-          openTags += `</${node.tagName}>`
-        } else {
-          closeTags += `</${node.tagName}>`
+        // inner text
+        htmlTree += innerText ? `\n${innerText}\n` : ''
+
+        const hasSubElement = node.children?.filter(
+          (child) => child.type === 'element'
+        ).length
+
+        // sub tree
+        if (hasSubElement) {
+          htmlTree += getHtmlTree(node, deepth + 1)
         }
+
+        htmlTree += `</${node.tagName}>\n`
       }
     })
 
-    return openTags + closeTags
+    return htmlTree
   }
 
   return ''
