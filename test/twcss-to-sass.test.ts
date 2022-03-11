@@ -52,7 +52,11 @@ test('convert to sass with comments', () => {
     }
 }`
 
-  const converterResult = convertToSass(htmlCotnent)
+  const converterConfigs = <any>{
+    useCommentBlocksAsClassName: false,
+    printComments: true,
+  }
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
@@ -92,4 +96,31 @@ test('convert to sass with comments class names', () => {
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
+})
+
+test('convert to sass for html', () => {
+  const htmlCotnent = `<!-- Container Start -->
+<!-- Container Any -->
+<div class="bg-white">
+    <!-- Some Div -->
+    <div class="flex justify-center items-center min-h-screen min-w-full">
+        ...
+    </div>
+</div>
+<!-- Container End-->`
+
+  const htmlOutput = `<!-- Container Start, Container Any -->
+<div class="container-start-container-any">
+    <!-- Some Div -->
+    <div class="some-div"></div>
+</div>`
+
+  const converterConfigs = <any>{
+    useCommentBlocksAsClassName: true,
+    printComments: true,
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
+
+  expect(converterResult?.html).toBe(htmlOutput)
 })
