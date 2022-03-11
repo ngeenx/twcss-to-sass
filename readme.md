@@ -47,6 +47,21 @@ npm i @egoistdeveloper/twcss-to-sass
 <!-- Container End-->
 ```
 
+**HTML Output**
+
+```xml
+<!-- Container Start, Container Any -->
+<div class="class-div-0">
+    <!-- Some Div -->
+    <div class="class-div-1">
+        <div class="class-div-2">
+            <!-- Inner Div -->
+            <div class="class-div-3"></div>
+        </div>
+    </div>
+</div>
+```
+
 **SASS Output**
 
 ```scss
@@ -99,7 +114,8 @@ npm i @egoistdeveloper/twcss-to-sass
             </div>
             <!-- Container End-->`;
 
-    console.log(convertToSass(html));
+    console.log(convertToSass(html).html);
+    console.log(convertToSass(html).sass);
 </script>
 ```
 
@@ -115,7 +131,8 @@ const htmlContent = fs.readFileSync(
   'UTF-8'
 )
 
-console.log(TwCssToSass.convertToSass(htmlContent));
+console.log(TwCssToSass.convertToSass(htmlContent).sass);
+console.log(TwCssToSass.convertToSass(htmlContent).html);
 
 ```
 
@@ -126,7 +143,8 @@ import { convertToSass } from '@egoistdeveloper/twcss-to-sass';
 
 const htmlContent = '<div class="w-72 h-40 bg-green-400 transform transition-all">My Text 1</div>';
 
-console.log(convertToSass(htmlContent));
+console.log(convertToSass(htmlContent).sass);
+console.log(convertToSass(htmlContent).html);
 
 ```
 

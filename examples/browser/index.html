@@ -11,10 +11,15 @@
     <h1>Tailwind to SASS Converter Basic Example</h1>
 
     <h3>HTML Content</h3>
-    <pre id="html-content"></pre>
+    <pre id="input-html"></pre>
+
+    <hr>
+
+    <h3>HTML Output</h3>
+    <pre id="output-html"></pre>
 
     <h3>SASS Output</h3>
-    <pre id="sass-output"></pre>
+    <pre id="output-sass"></pre>
 
     <!-- local -->
     <script src="./../../dist/umd/index.js"></script>
@@ -40,8 +45,12 @@
 </div>
 <!-- Container End-->`
 
-      document.querySelector('#html-content').innerText = html
-      document.querySelector('#sass-output').innerHTML = convertToSass(html)
+      const converterResult = convertToSass(html);
+
+      document.querySelector('#input-html').innerText = html
+
+      document.querySelector('#output-html').innerText = converterResult.html
+      document.querySelector('#output-sass').innerText = converterResult.sass
     </script>
   </body>
 </html>
