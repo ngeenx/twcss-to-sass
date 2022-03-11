@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Tailwind CSS to SASS Converter (beta)</title>
+    <title>Tailwind CSS to SASS Converter</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
@@ -30,10 +30,48 @@
         .code-container {
             height: 80vh;
             width: 100%;
+            padding-top: 10px;
         }
 
-        .splitter {
+        header.v-toolbar {
+          max-height: 65px;
+          box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0 4px 5px 0 rgb(0 0 0 / 0%), 0 1px 10px 0 rgb(0 0 0 / 2%) !important;
+        }
+
+        .v-slide-group__wrapper {
+          border-bottom: 1px solid #e0e0e0 !important;
+        }
+
+        .v-card {
+          border: 1px solid #e0e0e0 !important;
+        }
+
+        .vue-splitter .splitter {
+          background-color: #d8d8d8 !important;
           margin: 65px 10px 0px;
+          transition: all 0.3s ease-in-out;
+        }
+
+        .vue-splitter .splitter:hover {
+          background-color: #c2c2c2 !important;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .vue-splitter .splitter {
+            background-color: #4b4b4b !important;
+          }
+
+          .vue-splitter .splitter:hover {
+            background-color: #646464 !important;
+          }
+
+          .v-card {
+            border: 1px solid #3e3e3e !important;
+          }
+
+          .v-slide-group__wrapper {
+            border-bottom: 1px solid #3e3e3e !important;
+          }
         }
     </style>
 </head>
@@ -42,7 +80,7 @@
     <div id="app">
         <v-app v-cloak>
             <!-- Navbar -->
-            <v-toolbar class="pa-0" style="max-height: 65px;">
+            <v-toolbar class="pa-0">
                 <v-row>
                     <v-col cols="2"></v-col>
 
@@ -50,7 +88,7 @@
                       <v-toolbar-title>
                           <img src="./assets/favicon.png" height="20" width="20" alt="Logo">
 
-                            TailwindCSS to SASS Converter (beta)
+                            TailwindCSS to SASS Converter
                         </v-toolbar-title>
                     </v-col>
 
@@ -62,7 +100,7 @@
                             data-size="large"
                             data-show-count="true"
                             aria-label="Star facebook/react on GitHub">
-                            Star
+                            Star on Github
                         </a>
                     </v-col>
             </v-toolbar>
@@ -80,7 +118,7 @@
                               <!-- Title -->
                               <v-card-title primary-title class="justify-center">
                                 <div>
-                                  <h5 class="amber--text text--accent-2">
+                                  <h5 class="blue--text">
                                     TailwindCSS HTML Template
                                   </h5>
                                 </div>
@@ -109,11 +147,11 @@
                     <div slot="right-pane" class="overflow-hidden">
                       <v-row>
                         <v-col cols="12">
-                          <v-card>
+                          <v-card class="b-1">
                             <!-- Title -->
                             <v-card-title primary-title class="justify-center">
                               <div>
-                                <h5 class="amber--text text--accent-2">
+                                <h5 class="green--text">
                                   Output
                                 </h5>
                               </div>
@@ -156,14 +194,17 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
 
     <!-- @rmp135/vue-splitter -->
-    <script src="https://unpkg.com/@rmp135/vue-splitter@1.4.0/dist/vue-splitter.js"></script>
+    <script src="https://unpkg.com/@rmp135/vue-splitter@latest/dist/vue-splitter.js"></script>
 
     <!-- Vuetify -->
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 
+    <!-- store -->
+    <script src="https://unpkg.com/store@2.0.12/dist/store.modern.min.js"></script>
+
     <!-- twcss-to-sass -->
-    <script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/umd/index.js"></script>
-    <!-- <script src="../dist/umd/index.js"></script> -->
+    <!-- <script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/umd/index.js"></script> -->
+    <script src="../dist/umd/index.js"></script>
 
     <!-- Monaco Editor -->
     <script>
@@ -210,6 +251,7 @@
                 loadEditors: function () {
                     const defaultTemplate =
                         `<!-- Container Start -->\n<!-- Container Any -->\n<div class="bg-white">\n\t<!-- Some Div -->\n\t<div class="flex justify-center items-center min-h-screen min-w-full">\n\t\t<div class="flex relative">\n\t\t\t<!-- Inner Div -->\n\t\t\t<div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">\n\t\t\t\tMy Text 1\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n<!-- Container End-->`;
+                    const userTemplate = store.get('userTemplate') || defaultTemplate;
 
                     const {
                         convertToSass
@@ -238,15 +280,22 @@
 
                     inputHtmlMonacoEditor = monaco.editor.create(document.getElementById('inputHtmlEditorContainer'), Object
                         .assign(commonEditorConfig, {
-                            value: defaultTemplate,
+                            value: userTemplate.template ? userTemplate.template : defaultTemplate,
                             language: 'html',
                         }));
 
                     inputHtmlMonacoEditor.onDidChangeModelContent(function (e) {
-                        let converterResult = convertToSass(inputHtmlMonacoEditor.getValue(), converterConfigs);
+                        const template = inputHtmlMonacoEditor.getValue();
+
+                        let converterResult = convertToSass(template, converterConfigs);
 
                         outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
                         outputSassMonacoEditor.getModel().setValue(converterResult.sass);
+
+                        store.set('userTemplate', {
+                          template: template,
+                          output: converterResult
+                        });
                     });
 
                     //#endregion
@@ -256,7 +305,6 @@
 
                     outputHtmlMonacoEditor = monaco.editor.create(document.getElementById('outputHtmlEditorContainer'), Object
                       .assign(commonEditorConfig, {
-                          value: '',
                           language: 'html',
                       }));
 
@@ -266,7 +314,7 @@
                             language: 'scss',
                         }));
 
-                    let converterResult = convertToSass(defaultTemplate, converterConfigs);
+                    let converterResult = convertToSass(userTemplate.template ? userTemplate.template : defaultTemplate, converterConfigs);
 
                     outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
                     outputSassMonacoEditor.getModel().setValue(converterResult.sass);
