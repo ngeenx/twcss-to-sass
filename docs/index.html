@@ -79,14 +79,27 @@
                             <!-- Title -->
                             <v-row>
                                 <v-col>
-                                    Tailwind template (HTML format)
+                                  Tailwind template (HTML format)
                                 </v-col>
                             </v-row>
 
-                            <!-- Editor -->
+                            <!-- Editor Tabs -->
                             <v-row>
                                 <v-col>
-                                    <div id="htmlContainer" class="code-container"></div>
+                                    <v-col>
+                                      <v-tabs v-model="inputTabModel">
+                                        <v-tab href="#inputHtmlTab">
+                                          HTML
+                                        </v-tab>
+                                      </v-tabs>
+
+                                      <v-tabs-items v-model="inputTabModel">
+                                        <!-- Input HMTL Editor -->
+                                        <v-tab-item :key="1" value="inputHtmlTab">
+                                          <div id="inputHtmlEditorContainer" class="code-container"></div>
+                                        </v-tab-item>
+                                      </v-tabs-items>
+                                    </v-col>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -97,17 +110,37 @@
                     <div slot="right-pane" class="overflow-hidden">
                       <v-row>
                         <v-col cols="12">
-                            <!-- Title -->
+                          <!-- Title -->
                             <v-row>
                                 <v-col>
                                     SASS Output
                                 </v-col>
                             </v-row>
 
-                            <!-- Editor -->
+                            <!-- Editor Tabs -->
                             <v-row>
                                 <v-col>
-                                    <div id="sassContainer" class="code-container"></div>
+                                  <v-tabs v-model="outputTabModel">
+                                    <v-tab href="#outputHtmlTab">
+                                      HTML
+                                    </v-tab>
+
+                                    <v-tab href="#outputSassTab">
+                                      SASS
+                                    </v-tab>
+                                  </v-tabs>
+
+                                  <v-tabs-items v-model="outputTabModel">
+                                    <!-- Output HMTL Editor -->
+                                    <v-tab-item :key="1" value="outputHtmlTab">
+                                      <div id="outputHtmlEditorContainer" class="code-container"></div>
+                                    </v-tab-item>
+
+                                    <!-- Output SASS Editor -->
+                                    <v-tab-item :key="2" value="outputSassTab">
+                                      <div id="outputSassEditorContainer" class="code-container"></div>
+                                    </v-tab-item>
+                                  </v-tabs-items>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -167,7 +200,9 @@
                 htmlInput: null,
                 sassOutput: null,
                 htmlMonacoEditor: null,
-                sassMonacoEditor: null,
+                outputSassMonacoEditor: null,
+                inputTabModel: 1,
+                outputTabModel: 'outputSassTab'
             },
 
             methods: {
@@ -199,28 +234,32 @@
                           }
                         };
 
-                    htmlMonacoEditor = monaco.editor.create(document.getElementById('htmlContainer'), Object
+                    // Input HTML Editor
+                    inputHtmlMonacoEditor = monaco.editor.create(document.getElementById('inputHtmlEditorContainer'), Object
                         .assign(commonEditorConfig, {
                             value: defaultTemplate,
                             language: 'html',
                         }));
 
-                    sassMonacoEditor = monaco.editor.create(document.getElementById('sassContainer'), Object
-                        .assign(commonEditorConfig, {
-                            language: 'scss',
-                        }));
 
-                    sassMonacoEditor.getModel().setValue(convertToSass(defaultTemplate, converterConfigs));
-
-                    htmlMonacoEditor.onDidChangeModelContent(function (e) {
-                        let sassOutput = convertToSass(htmlMonacoEditor.getValue(), converterConfigs);
+                    inputHtmlMonacoEditor.onDidChangeModelContent(function (e) {
+                        let sassOutput = convertToSass(inputHtmlMonacoEditor.getValue(), converterConfigs);
 
                         if (!sassOutput || !sassOutput.length) {
                             sassOutput = 'Invalid HTML content.';
                         }
 
-                        sassMonacoEditor.getModel().setValue(sassOutput);
+                        outputSassMonacoEditor.getModel().setValue(sassOutput);
                     });
+
+                    // Output SASS Editor
+                    outputSassMonacoEditor = monaco.editor.create(document.getElementById('outputSassEditorContainer'), Object
+                        .assign(commonEditorConfig, {
+                            language: 'scss',
+                        }));
+
+                    outputSassMonacoEditor.getModel().setValue(convertToSass(defaultTemplate, converterConfigs));
+
                 },
 
                 /** get current browser theme */
@@ -237,22 +276,24 @@
                             theme: `vs-${e.matches ? 'dark' : 'light'}`
                         };
 
-                        htmlMonacoEditor.updateOptions(themeOption);
-                        sassMonacoEditor.updateOptions(themeOption);
+                        inputHtmlMonacoEditor.updateOptions(themeOption);
+                        outputSassMonacoEditor.updateOptions(themeOption);
 
                         this.$vuetify.theme.isDark = e.matches;
                     });
                 },
 
                 onSplitterResize: function(){
-                    htmlMonacoEditor.layout();
-                    sassMonacoEditor.layout();
+                  inputHtmlMonacoEditor.layout();
+                    outputSassMonacoEditor.layout();
                 },
             },
 
             mounted: function () {
+              setTimeout(() => {
                 this.loadEditors();
                 this.watchBrowserTheme();
+              }, 500);
             }
         });
     </script>
