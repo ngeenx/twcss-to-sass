@@ -9,7 +9,9 @@ test('convert to sass', () => {
     @apply w-72 h-40 bg-green-400 transform transition-all;
 }`
 
-  expect(convertToSass(htmlCotnent)).toBe(sassOutput)
+  const converterResult = convertToSass(htmlCotnent)
+
+  expect(converterResult?.sass).toBe(sassOutput)
 })
 
 test('convert to sass with inline css', () => {
@@ -24,7 +26,9 @@ test('convert to sass with inline css', () => {
     font-weight: 50px;
 }`
 
-  expect(convertToSass(htmlCotnent)).toBe(sassOutput)
+  const converterResult = convertToSass(htmlCotnent)
+
+  expect(converterResult?.sass).toBe(sassOutput)
 })
 
 test('convert to sass with comments', () => {
@@ -48,7 +52,9 @@ test('convert to sass with comments', () => {
     }
 }`
 
-  expect(convertToSass(htmlCotnent)).toBe(sassOutput)
+  const converterResult = convertToSass(htmlCotnent)
+
+  expect(converterResult?.sass).toBe(sassOutput)
 })
 
 test('convert to sass with comments class names', () => {
@@ -83,5 +89,7 @@ test('convert to sass with comments class names', () => {
     },
   }
 
-  expect(convertToSass(htmlCotnent, converterConfigs)).toBe(sassOutput)
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
+
+  expect(converterResult?.sass).toBe(sassOutput)
 })

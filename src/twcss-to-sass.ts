@@ -9,6 +9,7 @@ import {
   IHtmlNode,
   IHtmlNodeAttribute,
 } from './interfaces/html-node'
+import { IConverterResult } from './interfaces/converter-result'
 
 /**
  * Default js-beautify css formatter options
@@ -201,10 +202,6 @@ const filterHtmlData = function (
 const getClassName = function (node: IHtmlNode, deepth: number): string {
   let className = ''
 
-  const classComment = defaultOptions.printComments
-    ? `/* ${node.comment ? node.comment : node.tagName} -> ${node.order} */`
-    : ''
-
   if (node.comment && defaultOptions.useCommentBlocksAsClassName) {
     let classSlug = defaultOptions.classNameOptions.prefix
 
@@ -220,14 +217,14 @@ const getClassName = function (node: IHtmlNode, deepth: number): string {
 
     classSlug += defaultOptions.classNameOptions.suffix
 
-    className += `.${classSlug}`
+    className = classSlug
   } else if (node.tagName != 'div') {
-    className += `${node.tagName}`
+    className = `${node.tagName}`
   } else {
-    className += `.class-${node.tagName}-${deepth}`
+    className = `class-${node.tagName}-${deepth}`
   }
 
-  return classComment + className
+  return className
 }
 
 /**
@@ -249,7 +246,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
     return nodeTree
       .map((node: IHtmlNode) => {
         let treeString = '',
-          subTreeSTring = ''
+          subTreeString = ''
 
         if (node.filterAttributes === null && node.children === null) {
           return ''
@@ -257,8 +254,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
 
         if (Array.isArray(node.children) && node.children.length) {
           ++deepth
-
-          subTreeSTring = getSassTree(node, deepth)
+          subTreeString = getSassTree(node, deepth)
         }
 
         if (node.tagName == 'style' && node.filterAttributes) {
@@ -282,24 +278,75 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
                 node.filterAttributes.style,
                 ';'
               )
+
               treeString += node.filterAttributes.style
                 ? `\n${node.filterAttributes.style}\n`
                 : ''
             }
           }
 
-          if (treeString.length || subTreeSTring.length) {
-            let result = getClassName(node, deepth)
+          if (treeString.length || subTreeString.length) {
+            const classComment = defaultOptions.printComments
+              ? `/* ${node.comment ? node.comment : node.tagName} -> ${
+                  node.order
+                } */`
+              : ''
 
-            result += `{${treeString}${subTreeSTring}}`
+            const className = getClassName(node, deepth)
 
-            return result
+            return `${classComment}.${className}{${treeString}${subTreeString}}`
           }
         }
 
         return null
       })
       .join('')
+  }
+
+  return ''
+}
+
+/**
+ * Get ready to use HTML tree
+ *
+ * @param {Object} nodeTree
+ * @param {int} count
+ *
+ * @returns string
+ */
+const getHtmlTree = function (
+  nodeTree: IHtmlNode[] | IHtmlNode,
+  deepth = 0
+): string {
+  if (nodeTree) {
+    if (!Array.isArray(nodeTree)) {
+      nodeTree = nodeTree.children
+    }
+
+    let openTags = '',
+      closeTags = ''
+
+    nodeTree.forEach(function (node: IHtmlNode) {
+      if (node.type == 'element') {
+        const className = getClassName(node, deepth)
+
+        if (defaultOptions.printComments) {
+          if (node.comment){
+            openTags += `<!-- ${node.comment.trim()} -->`
+          }
+        }
+
+        openTags += `<${node.tagName} class="${className}">`
+
+        if (Array.isArray(node.children) && node.children.length) {
+          openTags += getHtmlTree(node, deepth + 1)
+        }
+
+        closeTags += `</${node.tagName}>`
+      }
+    })
+
+    return openTags + closeTags
   }
 
   return ''
@@ -316,7 +363,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
 export const convertToSass = function (
   html: string,
   options: ITwToSassOptions | null = null
-): null | string {
+): null | IConverterResult {
   if (html && html.length) {
     if (options) {
       defaultOptions = {
@@ -328,23 +375,35 @@ export const convertToSass = function (
     html = Utils.cleanText(html)
 
     const htmlJson: IHtmlNode[] | IHtmlNode = parse(html)
-
     const filteredHtmlData = filterHtmlData(htmlJson)
 
     if (filteredHtmlData) {
       const sassTreeResult = getSassTree(filteredHtmlData)
+      let htmlTreeResult = ''
+
+      if (sassTreeResult) {
+        htmlTreeResult = getHtmlTree(filteredHtmlData)
+      }
 
       // export with formatted output
       if (defaultOptions.formatOutput === true) {
-        const formattedResult = beautifyCss.css(
+        const formattedHtmlResult = beautifyCss.html(htmlTreeResult)
+
+        const formattedSassResult = beautifyCss.css(
           sassTreeResult,
           defaultOptions.formatterOptions
         )
 
-        return Utils.fixFomatterApplyIssue(formattedResult)
+        return {
+          sass: Utils.fixFomatterApplyIssue(formattedSassResult),
+          html: formattedHtmlResult,
+        }
       }
 
-      return sassTreeResult
+      return {
+        sass: sassTreeResult,
+        html: htmlTreeResult,
+      }
     }
   }
 

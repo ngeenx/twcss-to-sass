@@ -16,5 +16,7 @@ export interface IHtmlNode {
   order: number
   attributes: IHtmlNodeAttribute[] | null
   filterAttributes: IAttribute | null
+  sassClassName: string
   children: this[]
+  length: number
 }
