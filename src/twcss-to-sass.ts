@@ -248,7 +248,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
 
     return nodeTree
       .map((node: IHtmlNode) => {
-        let treeSTring = '',
+        let treeString = '',
           subTreeSTring = ''
 
         if (node.filterAttributes === null && node.children === null) {
@@ -272,7 +272,7 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
         } else {
           if (node.filterAttributes) {
             if (node.filterAttributes.class) {
-              treeSTring += node.filterAttributes.class
+              treeString += node.filterAttributes.class
                 ? `@apply ${node.filterAttributes.class};`
                 : ''
             }
@@ -282,16 +282,16 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
                 node.filterAttributes.style,
                 ';'
               )
-              treeSTring += node.filterAttributes.style
+              treeString += node.filterAttributes.style
                 ? `\n${node.filterAttributes.style}\n`
                 : ''
             }
           }
 
-          if (treeSTring.length || subTreeSTring.length) {
+          if (treeString.length || subTreeSTring.length) {
             let result = getClassName(node, deepth)
 
-            result += `{${treeSTring}${subTreeSTring}}`
+            result += `{${treeString}${subTreeSTring}}`
 
             return result
           }
