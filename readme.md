@@ -25,6 +25,13 @@ npm i @egoistdeveloper/twcss-to-sass
 <script src="https://unpkg.com/@egoistdeveloper/twcss-to-sass@latest/dist/umd/index.js"></script>
 ```
 
+## Todo
+
+- [ ] Fix missing texts with child elements
+- [ ] Filter non tailwind classes
+- [ ] Order classes
+- [ ] Group classes
+- [ ] Print as group classes
 
 ## Input-Output
 
