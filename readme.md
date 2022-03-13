@@ -28,7 +28,7 @@ npm i @egoistdeveloper/twcss-to-sass
 ## Todo
 
 - [ ] ~~Fix missing texts with child element~~ (himalaya does not support it)
-- [ ] Fix `group` utility class issue on SASS
+- [ ] Fix `group` and `peer` utility classes issue on SASS
 - [ ] Filter non tailwind classes
 - [ ] Order classes
 - [ ] Group classes
