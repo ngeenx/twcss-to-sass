@@ -33,6 +33,7 @@ npm i @egoistdeveloper/twcss-to-sass
 - [ ] Order classes
 - [ ] Group classes
 - [ ] Print as group classes
+- [ ] Add configs menu for playground
 
 ## Input-Output
 
