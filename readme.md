@@ -28,6 +28,7 @@ npm i @egoistdeveloper/twcss-to-sass
 ## Todo
 
 - [ ] Fix missing texts with child elements
+- [ ] Fix `group` utility class issue on SASS
 - [ ] Filter non tailwind classes
 - [ ] Order classes
 - [ ] Group classes
