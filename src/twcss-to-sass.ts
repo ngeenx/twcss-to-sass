@@ -51,7 +51,7 @@ let _defaultOptions: ITwToSassOptions = defaultOptions
  *
  * @returns IAttribute | null
  */
-const getAttributes = function (
+function getAttributes(
   attributes: IHtmlNodeAttribute[] | null,
   keys: string | string[]
 ): IAttribute | null {
@@ -88,7 +88,7 @@ const getAttributes = function (
  *
  * @param {array} styleElements
  */
-const getStyleContents = function (styleElements: IHtmlNode[]): IHtmlNode[] {
+function getStyleContents(styleElements: IHtmlNode[]): IHtmlNode[] {
   return styleElements.map((element: IHtmlNode) => {
     const styleContents = element.children
       .filter((x: IHtmlNode) => (x.type = 'text'))
@@ -112,7 +112,7 @@ const getStyleContents = function (styleElements: IHtmlNode[]): IHtmlNode[] {
  *
  * @returns Object
  */
-const filterHtmlData = function (
+function filterHtmlData(
   htmlJson: IHtmlNode[] | IHtmlNode,
   nestedOrder = 1
 ): IHtmlNode[] | null {
@@ -201,7 +201,7 @@ const filterHtmlData = function (
  *
  * @returns string
  */
-const getClassName = function (node: IHtmlNode, deepth: number): string {
+function getClassName(node: IHtmlNode, deepth: number): string {
   let className = ''
 
   if (node.comment && _defaultOptions.useCommentBlocksAsClassName) {
@@ -232,12 +232,12 @@ const getClassName = function (node: IHtmlNode, deepth: number): string {
 /**
  * Extract SASS tree from HTML JSON tree
  *
- * @param {Object} nodeTree
- * @param {int} count
+ * @param {IHtmlNode} nodeTree
+ * @param {int} deepth
  *
  * @returns string
  */
-const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
+function getSassTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
   if (nodeTree) {
     let styleCount = 0
 
@@ -311,15 +311,12 @@ const getSassTree = function (nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
 /**
  * Get ready to use HTML tree
  *
- * @param {Object} nodeTree
- * @param {int} count
+ * @param {IHtmlNode} nodeTree
+ * @param {int} deepth
  *
  * @returns string
  */
-const getHtmlTree = function (
-  nodeTree: IHtmlNode[] | IHtmlNode,
-  deepth = 0
-): string {
+function getHtmlTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0): string {
   if (nodeTree) {
     if (!Array.isArray(nodeTree)) {
       nodeTree = nodeTree.children
@@ -390,7 +387,7 @@ const getHtmlTree = function (
  *
  * @returns string
  */
-export const convertToSass = function (
+export function convertToSass(
   html: string,
   options: ITwToSassOptions | null = defaultOptions
 ): null | IConverterResult {
@@ -405,6 +402,7 @@ export const convertToSass = function (
     html = Utils.cleanText(html)
 
     const htmlJson: IHtmlNode[] | IHtmlNode = parse(html)
+
     const filteredHtmlData = filterHtmlData(htmlJson)
 
     if (filteredHtmlData) {
