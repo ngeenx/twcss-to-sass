@@ -126,3 +126,77 @@ test('convert to sass for html', () => {
 
   expect(converterResult?.html).toBe(htmlOutput)
 })
+
+test('convert to sass for html with void elements', () => {
+  const htmlCotnent = `<html lang="en">
+
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <title>Document</title>
+
+      <link rel="stylesheet" href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css" />
+
+      <base href="/public">
+  </head>
+
+  <body>
+      <h1 class="ml-1">Test Title</h1>
+      <br>
+      <br>
+      <br>
+
+      <hr />
+
+      <input value="Say My Name">
+  </body>
+
+  </html>`
+
+  const htmlOutput = `<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Document
+    </title>
+
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css" />
+
+    <base href="/public" />
+</head>
+
+<body>
+    <h1>
+        Test Title
+    </h1>
+
+    <br />
+
+    <br />
+
+    <br />
+
+    <hr />
+
+    <input value="Say My Name" />
+</body>
+
+</html>`
+
+  const converterConfigs = <any>{
+    useCommentBlocksAsClassName: true,
+    printComments: true,
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
+
+  expect(converterResult?.html).toBe(htmlOutput)
+})
