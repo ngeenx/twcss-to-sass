@@ -28,6 +28,8 @@ npm i @egoistdeveloper/twcss-to-sass
 ## Todo
 
 - [ ] ~~Fix missing texts with child element~~ (himalaya does not support it)
+- [ ] ~~Fix self-closing tags like `link`, `base`, `area`, `br` etc~~
+- [ ] Fix url conflict with class name in comment line
 - [ ] Fix `group` and `peer` utility classes issue on SASS
 - [ ] Filter non tailwind classes
 - [ ] Order classes

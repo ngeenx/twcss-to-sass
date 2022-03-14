@@ -3,6 +3,8 @@ import beautifyCss, { CSSBeautifyOptions } from 'js-beautify'
 import slug from 'slug'
 
 import Utils from './utils/utils'
+import HtmlUtils from './utils/html'
+
 import { ITwToSassOptions } from './interfaces/tw-to-sass-options'
 import {
   IAttribute,
@@ -343,13 +345,20 @@ function getHtmlTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0): string {
           ?.map((attribute) => `${attribute.key}="${attribute.value}"`)
           ?.join('')
 
+        // void elements
+        const isVoidElement = HtmlUtils.isVoidElement(node.tagName)
+
         // open tag
         if (className.indexOf('.') > -1) {
           const _className = className.replace('.', '')
 
-          htmlTree += `\n<${node.tagName} class="${_className}" ${attributes}>`
+          htmlTree += `\n<${node.tagName} class="${_className}" ${attributes} ${
+            isVoidElement ? '/' : ''
+          }>`
         } else {
-          htmlTree += `\n<${node.tagName} ${attributes}>`
+          htmlTree += `\n<${node.tagName} ${attributes} ${
+            isVoidElement ? '/' : ''
+          }>`
         }
 
         const innerText = node.children
@@ -369,7 +378,7 @@ function getHtmlTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0): string {
           htmlTree += getHtmlTree(node, deepth + 1)
         }
 
-        htmlTree += `</${node.tagName}>\n`
+        htmlTree += (!isVoidElement ? `</${node.tagName}>` : '') + '\n'
       }
     })
 
