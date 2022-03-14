@@ -18,108 +18,8 @@
     <link rel="stylesheet" data-name="vs/editor/editor.main"
         href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.min.css">
 
-    <style>
-        [v-cloak]>* {
-            display: none
-        }
-
-        [v-cloak]::before {
-            content: "loading…";
-            opacity: 0;
-        }
-
-        .code-container {
-            height: 75vh;
-            width: 100%;
-            padding-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        header.v-toolbar {
-          max-height: 65px;
-          box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0 4px 5px 0 rgb(0 0 0 / 0%), 0 1px 10px 0 rgb(0 0 0 / 2%) !important;
-        }
-
-        .v-slide-group__wrapper {
-          border-bottom: 1px solid #e0e0e0 !important;
-        }
-
-        .v-card {
-          border: 1px solid #e0e0e0 !important;
-        }
-
-        .vue-splitter .splitter {
-          background-color: #d8d8d8 !important;
-          margin: 65px 10px 0px;
-          transition: all 0.3s ease-in-out;
-        }
-
-        .vue-splitter .splitter:hover {
-          background-color: #c2c2c2 !important;
-        }
-
-        @media (prefers-color-scheme: dark) {
-          .vue-splitter .splitter {
-            background-color: #4b4b4b !important;
-          }
-
-          .vue-splitter .splitter:hover {
-            background-color: #646464 !important;
-          }
-
-          .v-card {
-            border: 1px solid #3e3e3e !important;
-          }
-
-          .v-slide-group__wrapper {
-            border-bottom: 1px solid #3e3e3e !important;
-          }
-        }
-
-        /* loading animation */
-        .loader,
-        .loader:after {
-          border-radius: 50%;
-          width: 10em;
-          height: 10em;
-        }
-        .loader {
-          top: 45vh !important;
-          margin: 60px auto;
-          font-size: 5px;
-          position: relative;
-          text-indent: -9999em;
-          border-top: 1.1em solid rgba(123, 123, 123, 0.2);
-          border-right: 1.1em solid rgba(123, 123, 123, 0.2);
-          border-bottom: 1.1em solid rgba(123, 123, 123, 0.2);
-          border-left: 1.1em solid #626262;
-          -webkit-transform: translateZ(0);
-          -ms-transform: translateZ(0);
-          transform: translateZ(0);
-          -webkit-animation: load8 1.1s infinite linear;
-          animation: load8 1.1s infinite linear;
-        }
-        @-webkit-keyframes load8 {
-          0% {
-            -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-          }
-          100% {
-            -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
-          }
-        }
-        @keyframes load8 {
-          0% {
-            -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-          }
-          100% {
-            -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
-          }
-        }
-    </style>
+    <!-- App CSS -->
+    <link rel="stylesheet" href="./assets/css/main.css">
 </head>
 
 <body>
@@ -235,6 +135,17 @@
                   </vue-splitter>
                 </v-container>
             </v-main>
+
+            <!-- Message Snackbar -->
+            <v-snackbar v-model="snackbar.show">
+              {{ snackbar.message }}
+
+              <template v-slot:action="{ attrs }">
+                <v-btn :color="snackbar.color" text v-bind="attrs" @click="snackbar.show = false">
+                  Close
+                </v-btn>
+              </template>
+            </v-snackbar>
         </v-app>
     </div>
 
@@ -266,173 +177,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
 
+
     <!-- Github Buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
-
-    <!-- App -->
-    <script>
-        const isBrowserDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        new Vue({
-            el: '#app',
-            vuetify: new Vuetify({
-                theme: {
-                    dark: isBrowserDarkTheme
-                },
-            }),
-
-            components: {
-              VueSplitter
-            },
-
-            data: {
-                htmlInput: null,
-                sassOutput: null,
-                htmlMonacoEditor: null,
-                outputSassMonacoEditor: null,
-                inputTabModel: null,
-                outputTabModel: null
-            },
-
-            methods: {
-                /** load monaco code editors */
-                loadEditors: function () {
-                    const defaultTemplate =
-                        `<!-- Container Start -->\n<!-- Container Any -->\n<div class="bg-white">\n\t<!-- Some Div -->\n\t<div class="flex justify-center items-center min-h-screen min-w-full">\n\t\t<div class="flex relative">\n\t\t\t<!-- Inner Div -->\n\t\t\t<div class="w-72 h-40 bg-green-400 transform transition-all skew-x-12 -skew-y-12 absolute rounded-lg">\n\t\t\t\tMy Text 1\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n<!-- Container End-->`;
-                    const userTemplate = store.get('userTemplate') || defaultTemplate;
-
-                    const {
-                        convertToSass
-                    } = TwCssToSass;
-
-                    const theme = this.getCurrentTheme(),
-                        commonEditorConfig = {
-                            theme: `vs-${theme}`,
-                            minimap: {
-                                enabled: false
-                            }
-                        };
-
-                    const converterConfigs = {
-                          useCommentBlocksAsClassName: true,
-                          printComments: true,
-                          classNameOptions: {
-                            lowercase: true,
-                            replaceWith: '-',
-                            prefix: '',
-                            suffix: ''
-                          }
-                        };
-
-                    //#region Input Editors
-
-                    inputHtmlMonacoEditor = monaco.editor.create(document.getElementById('inputHtmlEditorContainer'), Object
-                        .assign(commonEditorConfig, {
-                            value: userTemplate.template ? userTemplate.template : defaultTemplate,
-                            language: 'html',
-                        }));
-
-                    inputHtmlMonacoEditor.onDidChangeModelContent(function (e) {
-                        const template = inputHtmlMonacoEditor.getValue();
-
-                        let converterResult = convertToSass(template, converterConfigs);
-
-                        outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
-                        outputSassMonacoEditor.getModel().setValue(converterResult.sass);
-
-                        store.set('userTemplate', {
-                          template: template,
-                          output: converterResult
-                        });
-                    });
-
-                    //#endregion
-
-
-                    //#region Output Editors
-
-                    outputHtmlMonacoEditor = monaco.editor.create(document.getElementById('outputHtmlEditorContainer'), Object
-                      .assign(commonEditorConfig, {
-                          language: 'html',
-                      }));
-
-                    // Output SASS Editor
-                    outputSassMonacoEditor = monaco.editor.create(document.getElementById('outputSassEditorContainer'), Object
-                        .assign(commonEditorConfig, {
-                            language: 'scss',
-                        }));
-
-                    let converterResult = convertToSass(userTemplate.template ? userTemplate.template : defaultTemplate, converterConfigs);
-
-                    outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
-                    outputSassMonacoEditor.getModel().setValue(converterResult.sass);
-
-                    //#endregion
-                },
-
-                /** get current browser theme */
-                getCurrentTheme: function () {
-                    if (window.matchMedia) {
-                        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                    }
-                },
-
-                /** watch browser theme*/
-                watchBrowserTheme: function () {
-                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                        const themeOption = {
-                            theme: `vs-${e.matches ? 'dark' : 'light'}`
-                        };
-
-                        inputHtmlMonacoEditor.updateOptions(themeOption);
-
-                        outputHtmlMonacoEditor.updateOptions(themeOption);
-                        outputSassMonacoEditor.updateOptions(themeOption);
-
-                        this.$vuetify.theme.isDark = e.matches;
-                    });
-                },
-
-                /** resize editors on splitter position change */
-                onSplitterResize: function(){
-                  inputHtmlMonacoEditor.layout();
-
-                  outputHtmlMonacoEditor.layout();
-                  outputSassMonacoEditor.layout();
-                },
-
-                /** resize editors on input tabs switch */
-                onInputTabSwitch: function(tab) {
-                  setTimeout(() => {
-                    if (tab == 'inputHtmlTab') {
-                      inputHtmlMonacoEditor.layout();
-                    }
-                  }, 250);
-                },
-
-                /** resize editors on output tabs switch */
-                onOutputTabSwitch: function(tab){
-                  setTimeout(() => {
-                    if (tab == 'outputHtmlTab') {
-                      outputHtmlMonacoEditor.layout();
-                    } else if (tab == 'outputSassTab') {
-                      outputSassMonacoEditor.layout();
-                    }
-                  }, 250);
-                },
-            },
-
-            mounted: function () {
-              document.querySelector('.loader').remove();
-
-              setTimeout(() => {
-                this.loadEditors();
-                this.watchBrowserTheme();
-
-              }, 250);
-            }
-        });
-    </script>
+    <!-- App Script -->
+    <script src="./assets/js/main.js"></script>
 </body>
 
 </html>
