@@ -49,8 +49,7 @@
   "dependencies": {
     "@egoistdeveloper/twcss-to-sass": "file:egoistdeveloper-twcss-to-sass-2.0.1.tgz",
     "himalaya": "^1.1.0",
-    "js-beautify": "^1.14.0",
-    "slug": "^5.3.0"
+    "js-beautify": "^1.14.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",

@@ -1,9 +1,9 @@
 import { parse } from 'himalaya'
 import beautifyCss, { CSSBeautifyOptions } from 'js-beautify'
-import slug from 'slug'
 
 import Utils from './utils/utils'
 import HtmlUtils from './utils/html'
+import SlugUtils from './utils/slug'
 
 import { ITwToSassOptions } from './interfaces/tw-to-sass-options'
 import {
@@ -37,7 +37,7 @@ const defaultOptions: ITwToSassOptions = {
   formatterOptions: formatterOptions,
   classNameOptions: {
     lowercase: true,
-    replaceWith: '-',
+    replacement: '-',
     prefix: '',
     suffix: '',
   },
@@ -209,10 +209,10 @@ function getClassName(node: IHtmlNode, deepth: number): string {
   if (node.comment && _defaultOptions.useCommentBlocksAsClassName) {
     let classSlug = _defaultOptions.classNameOptions.prefix
 
-    classSlug += slug(node.comment, {
-      lower: !!_defaultOptions.classNameOptions.lowercase,
-      replacement: _defaultOptions.classNameOptions.replaceWith,
-    })
+    classSlug += SlugUtils.slugify(
+      node.comment,
+      _defaultOptions.classNameOptions
+    )
 
     classSlug =
       classSlug.length > _defaultOptions.maxClassNameLength

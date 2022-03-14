@@ -73,11 +73,11 @@ test('convert to sass with comments class names', () => {
 <!-- Container End-->`
 
   const sassOutput = `/* Container Start, Container Any -> 1 */
-.pre_container__start__container__any_suf {
+.pre_container_start_container_any_suf {
     @apply bg-white;
 
     /* Some Div -> 2 */
-    .pre_some__div_suf {
+    .pre_some_div_suf {
         @apply flex justify-center items-center min-h-screen min-w-full;
     }
 }`
@@ -87,7 +87,7 @@ test('convert to sass with comments class names', () => {
     printComments: true,
     classNameOptions: {
       lowercase: true,
-      replaceWith: '__',
+      replacement: '_',
       prefix: 'pre_',
       suffix: '_suf',
     },

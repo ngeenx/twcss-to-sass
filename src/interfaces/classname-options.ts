@@ -1,6 +1,8 @@
 export interface IClassNameOptions {
   lowercase: boolean
-  replaceWith: string
+  replacement: string
   prefix: string
   suffix: string
 }
+
+export default IClassNameOptions
