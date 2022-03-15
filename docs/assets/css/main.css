@@ -3,7 +3,10 @@
 }
 
 [v-cloak]::before {
+  /* content required for v-cloak */
   content: 'loading…';
+
+  /* but we need to hide for actual spinner */
   opacity: 0;
 }
 

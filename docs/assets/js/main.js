@@ -101,6 +101,82 @@ new Vue({
       }, 2000)
     },
 
+    /**
+     * fix tailwind fix @ rules
+     *
+     * @source https://github.com/microsoft/monaco-editor/issues/2284#issuecomment-858872212
+     * @source https://stackoverflow.com/a/61333686/6940144
+     */
+    installTailwindSassConfigs: function () {
+      const dataProvider = {
+        version: 1.1,
+        atDirectives: [
+          {
+            name: '@apply',
+            description:
+              'When using Tailwind with Sass, using !important with @apply requires you to use interpolation to compile properly.',
+            references: [
+              {
+                name: 'Tailwind Documentation',
+                url: 'https://tailwindcss.com/docs/using-with-preprocessors#sass',
+              },
+            ],
+          },
+          {
+            name: '@tailwind',
+            description:
+              "Use the `@tailwind` directive to insert Tailwind's `base`, `components`, `utilities` and `screens` styles into your CSS.",
+            references: [
+              {
+                name: 'Tailwind Documentation',
+                url: 'https://tailwindcss.com/docs/functions-and-directives#tailwind',
+              },
+            ],
+          },
+          {
+            name: '@responsive',
+            description:
+              'You can generate responsive variants of your own classes by wrapping their definitions in the `@responsive` directive:\n```css\n@responsive {\n  .alert {\n    background-color: #E53E3E;\n  }\n}\n```\n',
+            references: [
+              {
+                name: 'Tailwind Documentation',
+                url: 'https://tailwindcss.com/docs/functions-and-directives#responsive',
+              },
+            ],
+          },
+          {
+            name: '@screen',
+            description:
+              'The `@screen` directive allows you to create media queries that reference your breakpoints by **name** instead of duplicating their values in your own CSS:\n```css\n@screen sm {\n  /* ... */\n}\n```\n…gets transformed into this:\n```css\n@media (min-width: 640px) {\n  /* ... */\n}\n```\n',
+            references: [
+              {
+                name: 'Tailwind Documentation',
+                url: 'https://tailwindcss.com/docs/functions-and-directives#screen',
+              },
+            ],
+          },
+          {
+            name: '@variants',
+            description:
+              'Generate `hover`, `focus`, `active` and other **variants** of your own utilities by wrapping their definitions in the `@variants` directive:\n```css\n@variants hover, focus {\n   .btn-brand {\n    background-color: #3182CE;\n  }\n}\n```\n',
+            references: [
+              {
+                name: 'Tailwind Documentation',
+                url: 'https://tailwindcss.com/docs/functions-and-directives#variants',
+              },
+            ],
+          },
+        ],
+      }
+
+      monaco.languages.css.scssDefaults.setOptions({
+        data: {
+          useDefaultDataProvider: true,
+          dataProviders: [dataProvider],
+        },
+      })
+    },
+
     /** load monaco code editors */
     loadEditors: function () {
       const theme = this.getCurrentTheme(),
@@ -136,8 +212,6 @@ new Vue({
         document.getElementById('outputSassEditorContainer'),
         Object.assign(commonEditorConfig, { language: 'scss' })
       )
-
-      //#endregion
 
       this.convert(true)
     },
@@ -203,6 +277,7 @@ new Vue({
 
     setTimeout(() => {
       this.loadEditors()
+      this.installTailwindSassConfigs()
 
       this.watchBrowserTheme()
     }, 250)
