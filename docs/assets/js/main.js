@@ -223,7 +223,7 @@ new Vue({
             theme: `vs-${e.matches ? 'dark' : 'light'}`,
           }
 
-          inputHtmlMonacoEditor.updateOptions(themeOption)
+          this.inputHtmlMonacoEditor.updateOptions(themeOption)
 
           this.outputHtmlMonacoEditor.updateOptions(themeOption)
           this.outputSassMonacoEditor.updateOptions(themeOption)
@@ -244,7 +244,7 @@ new Vue({
     onInputTabSwitch: function (tab) {
       setTimeout(() => {
         if (tab == 'inputHtmlTab') {
-          inputHtmlMonacoEditor.layout()
+          this.inputHtmlMonacoEditor.layout()
         }
       }, 250)
     },
