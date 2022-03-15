@@ -17,7 +17,7 @@ new Vue({
   data: {
     htmlInput: null,
     sassOutput: null,
-    htmlMonacoEditor: null,
+    inputHtmlMonacoEditor: null,
     outputSassMonacoEditor: null,
     inputTabModel: null,
     outputTabModel: null,
@@ -41,8 +41,6 @@ new Vue({
         suffix: '',
       },
     },
-
-    inputHtmlMonacoEditor: null,
   },
 
   methods: {
@@ -58,14 +56,6 @@ new Vue({
           .setValue(
             userTemplate.template ? userTemplate.template : defaultTemplate
           )
-
-        this.outputHtmlMonacoEditor
-          .getModel()
-          .setValue(userTemplate.output.html)
-
-        this.outputSassMonacoEditor
-          .getModel()
-          .setValue(userTemplate.output.sass)
       }
 
       const { convertToSass } = TwCssToSass
@@ -81,7 +71,6 @@ new Vue({
 
           store.set('userTemplate', {
             template: template,
-            output: converterResult,
           })
 
           return
@@ -245,7 +234,7 @@ new Vue({
 
     /** resize editors on splitter position change */
     onSplitterResize: function () {
-      inputHtmlMonacoEditor.layout()
+      this.inputHtmlMonacoEditor.layout()
 
       this.outputHtmlMonacoEditor.layout()
       this.outputSassMonacoEditor.layout()

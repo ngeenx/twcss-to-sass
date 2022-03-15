@@ -210,7 +210,7 @@ function getClassName(node: IHtmlNode, deepth: number): string {
     let classSlug = _defaultOptions.classNameOptions.prefix
 
     classSlug += SlugUtils.slugify(
-      node.comment,
+      SlugUtils.removeUrl(node.comment),
       _defaultOptions.classNameOptions
     )
 
