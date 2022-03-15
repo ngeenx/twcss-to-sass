@@ -136,30 +136,21 @@ function filterHtmlData(
 
       parentNode.forEach((node: IHtmlNode) => {
         if (Array.isArray(node.children)) {
-          const previousNodes = []
-
-          // find available previous nodes
+          // find previous comment
           for (let i = 0; i < parentNode.length; i++) {
             if (parentNode[i] == node) {
-              if (parentNode[i - 1]) {
-                previousNodes.push(parentNode[i - 1])
-              }
+              const _node = parentNode[i - 1]
 
-              if (parentNode[i - 2]) {
-                previousNodes.push(parentNode[i - 2])
+              if (node) {
+                node.comment =
+                  _node && _node.type == 'comment' && _node.content
+                    ? Utils.cleanText(_node.content, true)
+                    : null
               }
 
               break
             }
           }
-
-          // get parent comment text
-          node.comment = previousNodes
-            .filter((x) => x.type == 'comment')
-            .map((x) => Utils.cleanText(x.content, true))
-            .filter((x) => x !== null)
-            .reverse()
-            .join(', ')
 
           node.order = nestedOrder
 
@@ -318,15 +309,15 @@ function getSassTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
  *
  * @returns string
  */
-function getHtmlTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0): string {
+function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
   if (nodeTree) {
     if (!Array.isArray(nodeTree)) {
-      nodeTree = nodeTree.children
+      // nodeTree = nodeTree.children
     }
 
     let htmlTree = ''
 
-    nodeTree.forEach(function (node: IHtmlNode) {
+    nodeTree.forEach(function (node: IHtmlNode, index) {
       if (node.type == 'element') {
         const className = getClassName(node, deepth)
 
@@ -375,10 +366,21 @@ function getHtmlTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0): string {
 
         // sub tree
         if (hasSubElement) {
-          htmlTree += getHtmlTree(node, deepth + 1)
+          htmlTree += getHtmlTree(node.children, deepth + 1)
         }
 
-        htmlTree += (!isVoidElement ? `</${node.tagName}>` : '') + '\n'
+        // prevent new line for siblings
+        let isNextNodeSibling = false
+
+        if (!hasSubElement && nodeTree[index + 1]) {
+          isNextNodeSibling =
+            nodeTree[index + 1].tagName === node.tagName &&
+            nodeTree[index + 1].comment === null
+        }
+
+        htmlTree +=
+          (!isVoidElement ? `</${node.tagName}>` : '') +
+          (!isNextNodeSibling ? '\n' : '')
       }
     })
 

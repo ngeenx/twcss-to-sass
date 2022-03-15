@@ -12,7 +12,7 @@ export interface IHtmlNode {
   type: string
   tagName: string
   content: string
-  comment: string
+  comment: string | null
   order: number
   attributes: IHtmlNodeAttribute[] | null
   filterAttributes: IAttribute | null

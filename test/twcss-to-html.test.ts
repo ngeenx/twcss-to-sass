@@ -11,8 +11,8 @@ test('convert to sass for html', () => {
 </div>
 <!-- Container End-->`
 
-  const htmlOutput = `<!-- Container Start, Container Any -->
-<div class="container-start-container-any">
+  const htmlOutput = `<!-- Container Any -->
+<div class="container-any">
     <!-- Some Div -->
     <div class="some-div">
         ...
@@ -32,38 +32,36 @@ test('convert to sass for html', () => {
 test('convert to sass for html with void elements', () => {
   const htmlCotnent = `<html lang="en">
 
-  <head>
-      <meta charset="UTF-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-      <title>Document</title>
+    <title>Document</title>
 
-      <link rel="stylesheet" href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css" />
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css" />
 
-      <base href="/public">
-  </head>
+    <base href="/public">
+</head>
 
-  <body>
-      <h1 class="ml-1">Test Title</h1>
-      <br>
-      <br>
-      <br>
+<body>
+    <h1 class="ml-1">Test Title</h1>
+    <br>
+    <br>
+    <br>
 
-      <hr />
+    <hr />
 
-      <input value="Say My Name">
-  </body>
+    <input value="Say My Name">
+</body>
 
-  </html>`
+</html>`
 
   const htmlOutput = `<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
-
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>
@@ -81,9 +79,7 @@ test('convert to sass for html with void elements', () => {
     </h1>
 
     <br />
-
     <br />
-
     <br />
 
     <hr />

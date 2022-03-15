@@ -42,7 +42,7 @@ test('convert to sass with comments', () => {
 </div>
 <!-- Container End-->`
 
-  const sassOutput = `/* Container Start, Container Any -> 1 */
+  const sassOutput = `/* Container Any -> 1 */
 .class-div-1 {
     @apply bg-white;
 
@@ -72,8 +72,8 @@ test('convert to sass with comments class names', () => {
 </div>
 <!-- Container End-->`
 
-  const sassOutput = `/* Container Start, Container Any -> 1 */
-.pre_container_start_container_any_suf {
+  const sassOutput = `/* Container Any -> 1 */
+.pre_container_any_suf {
     @apply bg-white;
 
     /* Some Div -> 2 */
