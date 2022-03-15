@@ -10,6 +10,12 @@
   opacity: 0;
 }
 
+.mdi-icon {
+  fill: currentColor;
+  opacity: 0.8;
+  height: 20px;
+}
+
 .code-container {
   height: 74vh;
   width: 100%;
