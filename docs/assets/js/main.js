@@ -29,9 +29,6 @@ new Vue({
       timeout: 3000,
       show: false,
     },
-    // snackbar: false,
-    // messageSnackbarColor: 'blue',
-    // messageSnackbarMessage: null,
 
     // twcss converter configs
     converterConfigs: {
@@ -65,6 +62,7 @@ new Vue({
         this.outputHtmlMonacoEditor
           .getModel()
           .setValue(userTemplate.output.html)
+
         this.outputSassMonacoEditor
           .getModel()
           .setValue(userTemplate.output.sass)
@@ -90,8 +88,17 @@ new Vue({
         }
 
         this.snackbar.show = true
-        this.snackbar.message = '3343 434 3'
+        this.snackbar.message = 'Conversion failed'
+        this.snackbar.color = 'red'
       }
+
+      this.snackbar.show = true
+      this.snackbar.message = 'Tailwind template not found'
+      this.snackbar.color = 'red'
+
+      setTimeout(() => {
+        this.snackbar = {}
+      }, 2000)
     },
 
     /** load monaco code editors */
@@ -112,21 +119,7 @@ new Vue({
       )
 
       this.inputHtmlMonacoEditor.onDidChangeModelContent(() => {
-        // const template = this.inputHtmlMonacoEditor.getValue();
-
-        // let converterResult = convertToSass(template, converterConfigs);
-
-        // outputHtmlMonacoEditor.getModel().setValue(converterResult.html);
-        // outputSassMonacoEditor.getModel().setValue(converterResult.sass);
-
-        // store.set('userTemplate', {
-        //   template: template,
-        //   output: converterResult
-        // });
-
         this.convert()
-
-        console.log(45)
       })
 
       //#endregion
