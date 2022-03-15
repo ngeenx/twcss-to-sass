@@ -53,6 +53,15 @@
                     </v-col>
             </v-toolbar>
 
+            <!-- Action Buttons -->
+            <v-slide-group multiple show-arrows class="top-v-slide-group mt-5 mx-auto">
+              <v-slide-item key="1" v-slot="{ active, toggle }">
+                <v-btn class="mx-2 font-weight-light text-capitalize" depressed rounded @click="formatHtml()">
+                  Format HTML
+                </v-btn>
+              </v-slide-item>
+            </v-slide-group>
+
             <!-- Main Container -->
             <v-main class="my-3">
                 <v-container fluid>

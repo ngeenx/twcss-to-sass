@@ -107,3 +107,8 @@ header.v-toolbar {
     transform: rotate(360deg);
   }
 }
+
+/* top slider group */
+.top-v-slide-group .v-slide-group__wrapper {
+  border-bottom: none !important;
+}

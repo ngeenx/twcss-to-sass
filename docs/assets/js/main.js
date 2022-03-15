@@ -259,6 +259,16 @@ new Vue({
         }
       }, 250)
     },
+
+    /** format html contents (input and output) */
+    formatHtml: function () {
+      // trigger formatter method
+      this.inputHtmlMonacoEditor.getAction('editor.action.formatDocument').run()
+
+      // scroll to top
+      this.inputHtmlMonacoEditor.setPosition({ column: 1, lineNumber: 1 })
+      this.outputHtmlMonacoEditor.setPosition({ column: 1, lineNumber: 1 })
+    },
   },
 
   mounted: function () {
