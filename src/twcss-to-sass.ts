@@ -45,6 +45,8 @@ const defaultOptions: ITwToSassOptions = {
 
 let _defaultOptions: ITwToSassOptions = defaultOptions
 
+let styles: IHtmlNode[] = []
+
 /**
  * Get style and class attributes
  *
@@ -103,8 +105,6 @@ function getStyleContents(element: IHtmlNode): IHtmlNode {
   })
 }
 
-let styles: IHtmlNode[] = []
-
 /**
  * Filter IHtmlNode array by node type and tagName
  *
@@ -119,51 +119,42 @@ function filterHtmlData(nodeTree: IHtmlNode[], deepth = 0): IHtmlNode[] {
       (x: IHtmlNode) => x.content !== ' ' && x.tagName != '!doctype'
     )
 
-    if (nodeTree && nodeTree.length) {
-      const elementList: IHtmlNode[] | null = []
-
-      nodeTree.forEach((node: IHtmlNode, index) => {
-        if (node.type == 'element') {
-          if (node.tagName == 'style') {
-            styles.push(getStyleContents(node))
-          } else {
-            node.filterAttributes = getAttributes(node.attributes, [
-              'class',
-              'style',
-            ])
-          }
-
-          // find element's comment in previous node
-          node.comment =
-            nodeTree[index - 1] && nodeTree[index - 1].type == 'comment'
-              ? Utils.cleanText(nodeTree[index - 1].content, true)
-              : null
+    nodeTree.forEach((node: IHtmlNode, index) => {
+      if (node.type == 'element') {
+        if (node.tagName == 'style') {
+          styles.push(getStyleContents(node))
+        } else {
+          node.filterAttributes = getAttributes(node.attributes, [
+            'class',
+            'style',
+          ])
         }
 
-        // allow only html elements and texts
-        if (node.type != 'comment' && node.tagName !== 'style') {
-          elementList.push(node)
+        // find element's comment in previous node
+        node.comment =
+          nodeTree[index - 1] && nodeTree[index - 1].type == 'comment'
+            ? Utils.cleanText(nodeTree[index - 1].content, true)
+            : null
+      }
+
+      // let's go deeper
+      if (Array.isArray(node.children) && node.children.length > 0) {
+        node.order = ++deepth
+
+        const childNodes: IHtmlNode[] = filterHtmlData(node.children, deepth)
+
+        if (childNodes && childNodes.length) {
+          node.children = childNodes.filter(
+            (x: IHtmlNode) => x.tagName != 'style' && x.type != 'comment'
+          )
+
+          node.hasElementChildren =
+            node.children.filter((x) => x.type == 'element').length > 0
         }
+      }
+    })
 
-        // let's go deeper
-        if (Array.isArray(node.children) && node.children.length > 0) {
-          node.order = ++deepth
-
-          const childNodes: IHtmlNode[] = filterHtmlData(node.children, deepth)
-
-          if (childNodes && childNodes.length) {
-            node.children = childNodes.filter(
-              (x: IHtmlNode) => x.tagName != 'style' && x.type != 'comment'
-            )
-
-            node.hasElementChildren =
-              node.children.filter((x) => x.type == 'element').length > 0
-          }
-        }
-      })
-
-      return nodeTree
-    }
+    return nodeTree
   }
 
   return []
@@ -212,6 +203,27 @@ function getClassName(node: IHtmlNode, deepth: number): string {
 }
 
 /**
+ * Get CSS class name from node details
+ *
+ * @param styles IHtmlNode[]
+ *
+ * @returns string
+ */
+function getCssTree(cssTree: IHtmlNode[]): string {
+  let css = ''
+
+  if (styles.length > 0) {
+    cssTree.forEach((style: IHtmlNode, index) => {
+      css += `// #region Style Group ${index + 1}\n\n`
+      css += `${style.content}\n`
+      css += `// #endregion\n\n`
+    })
+  }
+
+  return css
+}
+
+/**
  * Extract SASS tree from HTML JSON tree
  *
  * @param {IHtmlNode} nodeTree
@@ -219,70 +231,54 @@ function getClassName(node: IHtmlNode, deepth: number): string {
  *
  * @returns string
  */
-function getSassTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
-  if (nodeTree) {
-    let styleCount = 0
+function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
+  return nodeTree
+    .map((node: IHtmlNode) => {
+      let treeString = '',
+        subTreeString = ''
 
-    if (!Array.isArray(nodeTree)) {
-      nodeTree = nodeTree.children
-    }
+      if (Array.isArray(node.children) && node.children.length) {
+        ++deepth
 
-    return nodeTree
-      .map((node: IHtmlNode) => {
-        let treeString = '',
-          subTreeString = ''
+        subTreeString = getSassTree(node.children, deepth)
+      }
 
-        if (Array.isArray(node.children) && node.children.length) {
-          ++deepth
-
-          subTreeString = getSassTree(node, deepth)
+      if (node.filterAttributes) {
+        // print tailwind class names
+        if (node.filterAttributes.class) {
+          treeString += node.filterAttributes.class
+            ? `@apply ${node.filterAttributes.class};`
+            : ''
         }
 
-        if (node.tagName == 'style' && node.filterAttributes) {
-          styleCount += 1
+        // inline style printing
+        if (node.filterAttributes.style) {
+          node.filterAttributes.style = Utils.addMissingSuffix(
+            node.filterAttributes.style,
+            ';'
+          )
 
-          let result = `// #region STYLE #${styleCount}\n`
-          result += `\n${node.filterAttributes.style}\n`
-          result += '// #endregion\n\n'
-
-          return result
-        } else {
-          if (node.filterAttributes) {
-            if (node.filterAttributes.class) {
-              treeString += node.filterAttributes.class
-                ? `@apply ${node.filterAttributes.class};`
-                : ''
-            }
-
-            if (node.filterAttributes.style) {
-              node.filterAttributes.style = Utils.addMissingSuffix(
-                node.filterAttributes.style,
-                ';'
-              )
-
-              treeString += node.filterAttributes.style
-                ? `\n${node.filterAttributes.style}\n`
-                : ''
-            }
-          }
-
-          if (treeString.length || subTreeString.length) {
-            const classComment = _defaultOptions.printComments
-              ? `/* ${node.comment ? node.comment : node.tagName} -> ${
-                  node.order
-                } */`
-              : ''
-
-            const className = getClassName(node, deepth)
-
-            return `${classComment}${className}{${treeString}${subTreeString}}`
-          }
+          treeString += node.filterAttributes.style
+            ? `\n${node.filterAttributes.style}\n`
+            : ''
         }
+      }
 
-        return null
-      })
-      .join('')
-  }
+      if (treeString.length || subTreeString.length) {
+        const classComment = _defaultOptions.printComments
+          ? `/* ${node.comment ? node.comment : node.tagName} -> ${
+              node.order
+            } */`
+          : ''
+
+        const className = getClassName(node, deepth)
+
+        return `${classComment}${className}{${treeString}${subTreeString}}`
+      }
+
+      return null
+    })
+    .join('')
 
   return ''
 }
@@ -408,11 +404,15 @@ export function convertToSass(
     const filteredHtmlData = filterHtmlData(htmlJson)
 
     if (filteredHtmlData) {
-      const sassTreeResult = getSassTree(filteredHtmlData)
-      let htmlTreeResult = ''
+      let sassTreeResult = getSassTree(filteredHtmlData),
+        htmlTreeResult = ''
 
       if (sassTreeResult) {
         htmlTreeResult = getHtmlTree(filteredHtmlData)
+
+        const cssTreeResult = getCssTree(styles)
+
+        sassTreeResult = cssTreeResult + sassTreeResult
       }
 
       // export with formatted output
