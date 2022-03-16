@@ -18,5 +18,6 @@ export interface IHtmlNode {
   filterAttributes: IAttribute | null
   sassClassName: string
   children: this[]
+  hasElementChildren: boolean
   length: number
 }

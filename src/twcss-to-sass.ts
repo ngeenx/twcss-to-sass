@@ -90,22 +90,17 @@ function getAttributes(
  *
  * @param {array} styleElements
  */
-function getStyleContents(styleElements: IHtmlNode[]): IHtmlNode[] {
-  return styleElements.map((element: IHtmlNode) => {
-    const styleContents = element.children
-      .filter((x: IHtmlNode) => (x.type = 'text'))
-      .map((x: IHtmlNode) => x.content)
-      .join('')
-
-    return <IHtmlNode>(<unknown>{
-      tagName: 'style',
-      text: 'STYLE',
-      filterAttributes: {
-        style: styleContents,
-      },
-    })
+function getStyleContents(element: IHtmlNode): IHtmlNode {
+  return <IHtmlNode>(<unknown>{
+    tagName: 'style',
+    text: 'STYLE',
+    filterAttributes: {
+      style: element.content,
+    },
   })
 }
+
+let styles: IHtmlNode[] = []
 
 /**
  * Filter IHtmlNode array by node type and tagName
@@ -114,76 +109,61 @@ function getStyleContents(styleElements: IHtmlNode[]): IHtmlNode[] {
  *
  * @returns Object
  */
-function filterHtmlData(
-  htmlJson: IHtmlNode[] | IHtmlNode,
-  nestedOrder = 1
-): IHtmlNode[] | null {
-  if (htmlJson && Array.isArray(htmlJson)) {
-    const parentNode = htmlJson.filter(
-        (x: IHtmlNode) =>
-          (x.type == 'element' || x.type == 'comment') && x.tagName != 'style'
-      ),
-      styleElements = htmlJson.filter((x) => x.tagName == 'style')
+function filterHtmlData(nodeTree: IHtmlNode[], deepth = 0): IHtmlNode[] {
+  if (nodeTree.length > 0) {
+    // we do need to empty or doctype declaration
+    nodeTree = nodeTree.filter(
+      (x: IHtmlNode) => x.content !== ' ' && x.tagName != '!doctype'
+    )
 
-    let styleList: IHtmlNode[] = []
-
-    if (styleElements && styleElements.length) {
-      styleList = getStyleContents(styleElements)
-    }
-
-    if (parentNode && parentNode.length) {
+    if (nodeTree && nodeTree.length) {
       const elementList: IHtmlNode[] | null = []
 
-      parentNode.forEach((node: IHtmlNode) => {
-        if (Array.isArray(node.children)) {
-          // find previous comment
-          for (let i = 0; i < parentNode.length; i++) {
-            if (parentNode[i] == node) {
-              const _node = parentNode[i - 1]
-
-              if (node) {
-                node.comment =
-                  _node && _node.type == 'comment' && _node.content
-                    ? Utils.cleanText(_node.content, true)
-                    : null
-              }
-
-              break
-            }
+      nodeTree.forEach((node: IHtmlNode, index) => {
+        if (node.type == 'element') {
+          if (node.tagName == 'style') {
+            styles.push(getStyleContents(node))
+          } else {
+            node.filterAttributes = getAttributes(node.attributes, [
+              'class',
+              'style',
+            ])
           }
 
-          node.order = nestedOrder
-
-          const children: IHtmlNode[] | null = filterHtmlData(
-            node.children,
-            nestedOrder + 1
-          )
-
-          if (children && children.length) {
-            node.children = children.filter(
-              (x: IHtmlNode) => x.type == 'element'
-            )
-          }
+          // find element's comment in previous node
+          node.comment =
+            nodeTree[index - 1] && nodeTree[index - 1].type == 'comment'
+              ? Utils.cleanText(nodeTree[index - 1].content, true)
+              : null
         }
 
-        // get only class and inline style attributes
-        node.filterAttributes = getAttributes(node.attributes, [
-          'class',
-          'style',
-        ])
+        // allow only html elements and texts
+        if (node.type != 'comment' && node.tagName !== 'style') {
+          elementList.push(node)
+        }
 
-        if (node.filterAttributes !== null || node.children !== null) {
-          elementList?.push(node)
+        // let's go deeper
+        if (Array.isArray(node.children) && node.children.length > 0) {
+          node.order = ++deepth
+
+          const childNodes: IHtmlNode[] = filterHtmlData(node.children, deepth)
+
+          if (childNodes && childNodes.length) {
+            node.children = childNodes.filter(
+              (x: IHtmlNode) => x.tagName != 'style' && x.type != 'comment'
+            )
+
+            node.hasElementChildren =
+              node.children.filter((x) => x.type == 'element').length > 0
+          }
         }
       })
 
-      if (elementList && elementList.length) {
-        return [...styleList, ...elementList]
-      }
+      return nodeTree
     }
   }
 
-  return null
+  return []
 }
 
 /**
@@ -196,6 +176,8 @@ function filterHtmlData(
  */
 function getClassName(node: IHtmlNode, deepth: number): string {
   let className = ''
+
+  const exceptTagNames = ['html', 'head', 'body', 'style']
 
   if (node.comment && _defaultOptions.useCommentBlocksAsClassName) {
     let classSlug = _defaultOptions.classNameOptions.prefix
@@ -213,7 +195,11 @@ function getClassName(node: IHtmlNode, deepth: number): string {
     classSlug += _defaultOptions.classNameOptions.suffix
 
     className = '.' + classSlug
-  } else if (node.tagName != 'div') {
+  } else if (
+    exceptTagNames.indexOf(node.tagName) > -1 ||
+    (!node.hasElementChildren && node.tagName != 'div')
+  ) {
+    // TODO: add excape option for tag names
     className = `${node.tagName}`
   } else {
     className = `.class-${node.tagName}-${deepth}`
@@ -242,10 +228,6 @@ function getSassTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
       .map((node: IHtmlNode) => {
         let treeString = '',
           subTreeString = ''
-
-        if (node.filterAttributes === null && node.children === null) {
-          return ''
-        }
 
         if (Array.isArray(node.children) && node.children.length) {
           ++deepth
@@ -311,16 +293,11 @@ function getSassTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
  */
 function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
   if (nodeTree) {
-    if (!Array.isArray(nodeTree)) {
-      // nodeTree = nodeTree.children
-    }
-
     let htmlTree = ''
 
     nodeTree.forEach(function (node: IHtmlNode, index) {
+      const className = getClassName(node, deepth)
       if (node.type == 'element') {
-        const className = getClassName(node, deepth)
-
         if (_defaultOptions.printComments) {
           if (node.comment) {
             htmlTree += `\n<!-- ${node.comment.trim()} -->`
@@ -352,10 +329,16 @@ function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
           }>`
         }
 
-        const innerText = node.children
-          ?.filter((child) => child.type === 'text')
-          .map((child) => child.content)
-          .join('')
+        // inner text
+
+        const textChildNodes = node.children?.filter(
+          (child) => child.type === 'text'
+        )
+
+        const innerText =
+          node.children?.length == textChildNodes?.length
+            ? textChildNodes.map((child) => child.content).join('')
+            : ''
 
         // inner text
         htmlTree += innerText ? `\n${innerText}\n` : ''
@@ -381,6 +364,9 @@ function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
         htmlTree +=
           (!isVoidElement ? `</${node.tagName}>` : '') +
           (!isNextNodeSibling ? '\n' : '')
+      } else if (node.type == 'text') {
+        // inner text
+        htmlTree += node.content ? `\n${node.content}\n` : ''
       }
     })
 
@@ -402,6 +388,8 @@ export function convertToSass(
   html: string,
   options: ITwToSassOptions | null = defaultOptions
 ): null | IConverterResult {
+  styles = []
+
   if (html && html.length) {
     if (options) {
       _defaultOptions = {
@@ -412,7 +400,7 @@ export function convertToSass(
 
     html = Utils.cleanText(html)
 
-    const htmlJson: IHtmlNode[] | IHtmlNode = parse(html)
+    const htmlJson: IHtmlNode[] = parse(html)
 
     const filteredHtmlData = filterHtmlData(htmlJson)
 
