@@ -91,12 +91,15 @@ function getAttributes(
  * @param {array} styleElements
  */
 function getStyleContents(element: IHtmlNode): IHtmlNode {
+  const content = element.children
+    .filter((x) => x.type == 'text')
+    .map((x) => x.content)
+    .join('')
+
   return <IHtmlNode>(<unknown>{
     tagName: 'style',
     text: 'STYLE',
-    filterAttributes: {
-      style: element.content,
-    },
+    content: content,
   })
 }
 
@@ -231,6 +234,7 @@ function getSassTree(nodeTree: IHtmlNode[] | IHtmlNode, deepth = 0) {
 
         if (Array.isArray(node.children) && node.children.length) {
           ++deepth
+
           subTreeString = getSassTree(node, deepth)
         }
 
@@ -297,7 +301,7 @@ function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
 
     nodeTree.forEach(function (node: IHtmlNode, index) {
       const className = getClassName(node, deepth)
-      if (node.type == 'element') {
+      if (node.type == 'element' && node.tagName != 'style') {
         if (_defaultOptions.printComments) {
           if (node.comment) {
             htmlTree += `\n<!-- ${node.comment.trim()} -->`
@@ -365,7 +369,6 @@ function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
           (!isVoidElement ? `</${node.tagName}>` : '') +
           (!isNextNodeSibling ? '\n' : '')
       } else if (node.type == 'text') {
-        // inner text
         htmlTree += node.content ? `\n${node.content}\n` : ''
       }
     })
