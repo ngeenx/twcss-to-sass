@@ -174,6 +174,7 @@ function getClassName(node: IHtmlNode, deepth: number): string {
 
   const exceptTagNames = ['html', 'head', 'body', 'style']
 
+  // comment to class name
   if (node.comment && _defaultOptions.useCommentBlocksAsClassName) {
     let classSlug = _defaultOptions.classNameOptions.prefix
 
@@ -190,13 +191,18 @@ function getClassName(node: IHtmlNode, deepth: number): string {
     classSlug += _defaultOptions.classNameOptions.suffix
 
     className = '.' + classSlug
-  } else if (
+  } // tag name selector
+  else if (
     exceptTagNames.indexOf(node.tagName) > -1 ||
     (!node.hasElementChildren && node.tagName != 'div')
   ) {
-    // TODO: add excape option for tag names
+    // TODO: add exclude option for tag names
     className = `${node.tagName}`
-  } else {
+  } // default placeholder class name
+  else if (
+    node.filterAttributes?.style != null ||
+    node.filterAttributes?.class != null
+  ) {
     className = `.class-${node.tagName}-${deepth}`
   }
 
@@ -420,6 +426,7 @@ function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
 
     nodeTree.forEach(function (node: IHtmlNode, index) {
       const className = getClassName(node, deepth)
+
       if (node.type == 'element' && node.tagName != 'style') {
         if (_defaultOptions.printComments) {
           if (node.comment) {
