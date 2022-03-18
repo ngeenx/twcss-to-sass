@@ -324,6 +324,105 @@ function groupUtilityToSass(
   return ''
 }
 
+let peerModifierList: IGroupModifierPair[] = []
+
+/**
+ * Convert peer-* modifiers to sub-selectors
+ *
+ * @param nodeTree IHtmlNode[]
+ * @param deepth number
+ * @param isChildNodes boolean
+ *
+ * @returns string
+ */
+function peerUtilityToSass(
+  nodeTree: IHtmlNode[],
+  peerClass: string,
+  isChildNodes = false
+): string {
+  if (!isChildNodes) {
+    peerModifierList = []
+  }
+
+  let groupSass = ''
+
+  const groupPattern = /peer-([a-z0-9]+):([a-z0-9-:\/]+)/gm
+
+  nodeTree.forEach((node: IHtmlNode) => {
+    if (node.filterAttributes) {
+      console.log(node.filterAttributes.class?.match(groupPattern))
+      if (
+        node.filterAttributes.class &&
+        node.filterAttributes.class?.match(groupPattern)
+      ) {
+        node.filterAttributes.class?.match(groupPattern)?.forEach((item) => {
+          const matches = new RegExp(groupPattern).exec(item)
+
+          const groupModifierPair = <IGroupModifierPair>{
+            modifier: matches?.[1],
+            utility: matches?.[2],
+            className: getClassName(node, node.order),
+          }
+
+          console.log(groupModifierPair)
+
+          peerModifierList.push(groupModifierPair)
+        })
+
+        if (node.filterAttributes.class.match(/(peer)(?!-)/gm)) {
+          return groupSass
+        } else if (node.children.length) {
+          peerUtilityToSass(node.children, peerClass, true)
+        }
+      } else {
+        peerUtilityToSass(node.children, peerClass, true)
+      }
+    }
+  })
+
+  if (!isChildNodes) {
+    if (peerModifierList.length > 0) {
+      const modifierGroups = peerModifierList.reduce((prev, next) => {
+        prev[next.modifier] = prev[next.modifier] || []
+        prev[next.modifier].push(next)
+
+        return prev
+      }, Object.create(null))
+
+      Object.entries(modifierGroups)?.forEach(([modifier, utilityList]) => {
+        const _utilityList = <IGroupModifierPair[]>utilityList
+
+        const classGroups = _utilityList.reduce((prev, next) => {
+          prev[next.className] = prev[next.className] || []
+          prev[next.className].push(next)
+
+          return prev
+        }, Object.create(null))
+
+        groupSass += `\n\n/* #region Peer modifier: ${modifier} */\n\n`
+
+        Object.entries(classGroups)?.forEach(([className, utilityList]) => {
+          const _utilityList = <IGroupModifierPair[]>utilityList
+
+          const classList = _utilityList
+            .map((x: IGroupModifierPair) => x.utility)
+            .join(' ')
+
+          groupSass += `${peerClass}:${modifier} ~ ${className}{\n`
+          groupSass += `\t\t@apply ${classList};\n`
+          groupSass += `\t}\n`
+        })
+
+        groupSass += `\n/* #endregion */\n\n`
+      })
+    }
+
+    return groupSass
+  }
+
+  return ''
+}
+
 /**
  * Extract SASS tree from HTML JSON tree
  *
@@ -331,7 +430,7 @@ function groupUtilityToSass(
  *
  * @returns string
  */
-function getSassTree(nodeTree: IHtmlNode[]) {
+function getSassTree(nodeTree: IHtmlNode[]): string {
   return nodeTree
     .map((node: IHtmlNode) => {
       let treeString = '',
@@ -374,7 +473,7 @@ function getSassTree(nodeTree: IHtmlNode[]) {
         let groupUtilityTree = ''
 
         // convert group utilities
-        if (node.filterAttributes?.class?.match(/ (group)(?!-)/gm)) {
+        if (node.filterAttributes?.class?.match(/(group)(?!-)/gm)) {
           groupUtilityTree = groupUtilityToSass(node.children)
 
           if (groupUtilityTree !== '') {
@@ -391,7 +490,19 @@ function getSassTree(nodeTree: IHtmlNode[]) {
           }
         }
 
-        return `${classComment}
+        let peerUtilityTree = ''
+
+        // convert peer utilities
+        if (node.filterAttributes?.class?.match(/(peer)(?!-)/gm)) {
+          peerUtilityTree = peerUtilityToSass(nodeTree, className)
+
+          if (peerUtilityTree !== '') {
+            // clear parent group class name
+            treeString = treeString.replace(/(peer)(?!-)/gm, ' ')
+          }
+        }
+
+        return `${classComment}${peerUtilityTree}
           ${className} {
             ${treeString} ${subTreeString}
           }`
@@ -527,6 +638,11 @@ export function convertToSass(
         htmlTreeResult = ''
 
       if (sassTreeResult) {
+        sassTreeResult = sassTreeResult.replace(
+          / peer-([a-z0-9]+):([a-z0-9-:\/]+)/gm,
+          ''
+        )
+
         htmlTreeResult = getHtmlTree(filteredHtmlData)
 
         const cssTreeResult = getCssTree(styles)
