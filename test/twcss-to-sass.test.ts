@@ -113,7 +113,7 @@ test('convert to sass with group-modifier', () => {
     /* #region Group modifier: hover */
 
     &:hover {
-        .class-div-1 {
+        .class-div-2 {
             @apply opacity-100 bg-gradient-to-t;
         }
     }

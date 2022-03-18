@@ -234,14 +234,12 @@ let groupModifierList: IGroupModifierPair[] = []
  * Convert group-* modifiers to sub-selectors
  *
  * @param nodeTree IHtmlNode[]
- * @param deepth number
  * @param isChildNodes boolean
  *
  * @returns string
  */
 function groupUtilityToSass(
   nodeTree: IHtmlNode[],
-  deepth: number,
   isChildNodes = false
 ): string {
   if (!isChildNodes) {
@@ -264,7 +262,7 @@ function groupUtilityToSass(
           const groupModifierPair = <IGroupModifierPair>{
             modifier: matches?.[1],
             utility: matches?.[2],
-            className: getClassName(node, deepth),
+            className: getClassName(node, node.order),
           }
 
           groupModifierList.push(groupModifierPair)
@@ -273,10 +271,10 @@ function groupUtilityToSass(
         if (node.filterAttributes.class.match(/(group)(?!-)/gm)) {
           return groupSass
         } else if (node.children.length) {
-          groupUtilityToSass(node.children, ++deepth, true)
+          groupUtilityToSass(node.children, true)
         }
       } else {
-        groupUtilityToSass(node.children, ++deepth, true)
+        groupUtilityToSass(node.children, true)
       }
     }
   })
@@ -377,7 +375,7 @@ function getSassTree(nodeTree: IHtmlNode[]) {
 
         // convert group utilities
         if (node.filterAttributes?.class?.match(/ (group)(?!-)/gm)) {
-          groupUtilityTree = groupUtilityToSass(node.children, node.order)
+          groupUtilityTree = groupUtilityToSass(node.children)
 
           if (groupUtilityTree !== '') {
             treeString += groupUtilityTree
