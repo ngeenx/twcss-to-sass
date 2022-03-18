@@ -30,7 +30,7 @@ npm i @egoistdeveloper/twcss-to-sass
 - [x] ~~Fix self-closing tags like `link`, `base`, `area`, `br` etc~~
 - [x] ~~Fix url conflict with class name in comment line~~
 - [ ] Add option for duplicated classes
-- [ ] ~~Fix `group`~~ and `peer` utility classes issue on SASS
+- [ ] ~~Fix `group` and `peer` utility classes issue on SASS~~
 - [ ] Filter non tailwind classes
 - [ ] Order classes
 - [ ] Group classes
