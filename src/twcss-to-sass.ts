@@ -12,6 +12,7 @@ import {
   IHtmlNodeAttribute,
 } from './interfaces/html-node'
 import { IConverterResult } from './interfaces/converter-result'
+import { IGroupModifierPair } from './interfaces/group-modifier-pair'
 
 /**
  * Default js-beautify css formatter options
@@ -214,13 +215,115 @@ function getCssTree(cssTree: IHtmlNode[]): string {
 
   if (styles.length > 0) {
     cssTree.forEach((style: IHtmlNode, index) => {
-      css += `// #region Style Group ${index + 1}\n\n`
+      css += `/* #region Style Group ${index + 1} */\n\n`
       css += `${style.content}\n`
-      css += `// #endregion\n\n`
+      css += `/* #endregion */\n\n`
     })
   }
 
   return css
+}
+
+let groupModifierList: IGroupModifierPair[] = []
+
+/**
+ * Convert group-* modifiers to sub-selectors
+ *
+ * @param nodeTree IHtmlNode[]
+ * @param deepth number
+ * @param isChildNodes boolean
+ *
+ * @returns string
+ */
+function groupUtilityToSass(
+  nodeTree: IHtmlNode[],
+  deepth: number,
+  isChildNodes = false
+): string {
+  if (!isChildNodes) {
+    groupModifierList = []
+  }
+
+  let groupSass = ''
+
+  const groupPattern = / group-([a-z0-9]+):([a-z0-9-:\/]+)/gm
+
+  nodeTree.forEach((node: IHtmlNode) => {
+    if (node.filterAttributes) {
+      if (
+        node.filterAttributes.class &&
+        node.filterAttributes.class?.match(groupPattern)
+      ) {
+        node.filterAttributes.class?.match(groupPattern)?.forEach((item) => {
+          const matches = new RegExp(groupPattern).exec(item)
+
+          const groupModifierPair = <IGroupModifierPair>{
+            modifier: matches?.[1],
+            utility: matches?.[2],
+            className: getClassName(node, deepth),
+          }
+
+          groupModifierList.push(groupModifierPair)
+        })
+
+        if (node.filterAttributes.class.match(/(group)(?!-)/gm)) {
+          return groupSass
+        } else if (node.children.length) {
+          groupUtilityToSass(node.children, ++deepth, true)
+        }
+      }
+    }
+  })
+
+  if (!isChildNodes) {
+    if (groupModifierList.length > 0) {
+      const modifierGroups = groupModifierList.reduce((prev, next) => {
+        prev[next.modifier] = prev[next.modifier] || []
+        prev[next.modifier].push(next)
+
+        return prev
+      }, Object.create(null))
+
+      Object.entries(modifierGroups)?.forEach(([modifier, utilityList]) => {
+        const _utilityList = <IGroupModifierPair[]>utilityList
+
+        const classGroups = _utilityList.reduce((prev, next) => {
+          prev[next.className] = prev[next.className] || []
+          prev[next.className].push(next)
+
+          return prev
+        }, Object.create(null))
+
+        groupSass += `&:${modifier} {\n`
+
+        Object.entries(classGroups)?.forEach(([className, utilityList]) => {
+          const _utilityList = <IGroupModifierPair[]>utilityList
+
+          const classList = _utilityList
+            .map((x: IGroupModifierPair) => x.utility)
+            .join(' ')
+
+          groupSass += `\t${className} {\n`
+          groupSass += `\t\t@apply ${classList};\n`
+          groupSass += `\t}\n`
+        })
+
+        groupSass += `}\n\n`
+
+        // const classList = _utilityList
+        //   .map((x: IGroupModifierPair) => x.utility)
+        //   .join(' ')
+
+        // groupSass += `&:${modifier} {\n`
+        // groupSass += `\t@apply ${classList};\n`
+        // groupSass += `}\n`
+      })
+    }
+
+    return groupSass
+  }
+
+  return ''
 }
 
 /**
@@ -246,9 +349,14 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
       if (node.filterAttributes) {
         // print tailwind class names
         if (node.filterAttributes.class) {
-          treeString += node.filterAttributes.class
+          let tailwindClassList = node.filterAttributes.class
             ? `@apply ${node.filterAttributes.class};`
             : ''
+
+          // remove group class
+          tailwindClassList = tailwindClassList.replace(/(group)(?!-)/gm, ' ')
+
+          treeString += tailwindClassList
         }
 
         // inline style printing
@@ -259,7 +367,7 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
           )
 
           treeString += node.filterAttributes.style
-            ? `\n${node.filterAttributes.style}\n`
+            ? `\n\n${node.filterAttributes.style}`
             : ''
         }
       }
@@ -273,7 +381,26 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
 
         const className = getClassName(node, deepth)
 
-        return `${classComment}${className}{${treeString}${subTreeString}}`
+        let groupUtilityTree = ''
+
+        if (node.filterAttributes?.class?.match(/(group)(?!-)/gm)) {
+          groupUtilityTree = groupUtilityToSass(node.children, deepth)
+
+          if (groupUtilityTree !== '') {
+            treeString += groupUtilityTree
+
+            // clear group modifier classes from @apply
+            subTreeString = subTreeString.replace(
+              / group-([a-z0-9]+):([a-z0-9-:\/]+)/gm,
+              ''
+            )
+          }
+        }
+
+        return `${classComment}
+          ${className} {
+            ${treeString} ${subTreeString}
+          }`
       }
 
       return null

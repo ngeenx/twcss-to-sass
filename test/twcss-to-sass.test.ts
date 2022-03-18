@@ -21,6 +21,7 @@ test('convert to sass with inline css', () => {
   const sassOutput = `/* div -> 1 */
 .class-div-1 {
     @apply w-72 h-40 bg-green-400 transform transition-all;
+
     border: 1px solid white;
     padding: 30px;
     font-weight: 50px;
