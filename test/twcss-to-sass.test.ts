@@ -98,3 +98,35 @@ test('convert to sass with comments class names', () => {
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
+
+test('convert to sass with group-modifier', () => {
+  const htmlCotnent = `<div class="inline relative group h-48">
+    <div class=" bottom-0 px-3 space-x-2 group-hover:opacity-100 group-hover:bg-gradient-to-t">
+        Test
+    </div>
+</div>`
+
+  const sassOutput = `/* div -> 1 */
+.class-div-1 {
+    @apply inline relative h-48;
+
+    /* #region Group modifier: hover */
+
+    &:hover {
+        .class-div-1 {
+            @apply opacity-100 bg-gradient-to-t;
+        }
+    }
+
+    /* #endregion */
+
+    /* div -> 2 */
+    .class-div-2 {
+        @apply bottom-0 px-3 space-x-2;
+    }
+}`
+
+  const converterResult = convertToSass(htmlCotnent)
+
+  expect(converterResult?.sass).toBe(sassOutput)
+})
