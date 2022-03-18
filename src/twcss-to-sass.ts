@@ -200,10 +200,7 @@ function getClassName(node: IHtmlNode, deepth: number): string {
     // TODO: add exclude option for tag names
     className = `${node.tagName}`
   } // default placeholder class name
-  else if (
-    node.filterAttributes?.style != null ||
-    node.filterAttributes?.class != null
-  ) {
+  else {
     className = `.class-${node.tagName}-${deepth}`
   }
 
