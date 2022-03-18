@@ -296,6 +296,7 @@ function groupUtilityToSass(
           return prev
         }, Object.create(null))
 
+        groupSass += `\n\n/* #region Group modifier: ${modifier} */\n\n`
         groupSass += `&:${modifier} {\n`
 
         Object.entries(classGroups)?.forEach(([className, utilityList]) => {
@@ -310,7 +311,8 @@ function groupUtilityToSass(
           groupSass += `\t}\n`
         })
 
-        groupSass += `}\n\n`
+        groupSass += `}`
+        groupSass += `\n/* #endregion */\n\n`
       })
     }
 
