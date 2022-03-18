@@ -271,6 +271,8 @@ function groupUtilityToSass(
         } else if (node.children.length) {
           groupUtilityToSass(node.children, ++deepth, true)
         }
+      } else {
+        groupUtilityToSass(node.children, ++deepth, true)
       }
     }
   })
@@ -309,14 +311,6 @@ function groupUtilityToSass(
         })
 
         groupSass += `}\n\n`
-
-        // const classList = _utilityList
-        //   .map((x: IGroupModifierPair) => x.utility)
-        //   .join(' ')
-
-        // groupSass += `&:${modifier} {\n`
-        // groupSass += `\t@apply ${classList};\n`
-        // groupSass += `}\n`
       })
     }
 
@@ -353,9 +347,6 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
             ? `@apply ${node.filterAttributes.class};`
             : ''
 
-          // remove group class
-          tailwindClassList = tailwindClassList.replace(/(group)(?!-)/gm, ' ')
-
           treeString += tailwindClassList
         }
 
@@ -383,11 +374,14 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
 
         let groupUtilityTree = ''
 
-        if (node.filterAttributes?.class?.match(/(group)(?!-)/gm)) {
+        if (node.filterAttributes?.class?.match(/ (group)(?!-)/gm)) {
           groupUtilityTree = groupUtilityToSass(node.children, deepth)
 
           if (groupUtilityTree !== '') {
             treeString += groupUtilityTree
+
+            // clear parent group class name
+            treeString = treeString.replace(/(group)(?!-)/gm, ' ')
 
             // clear group modifier classes from @apply
             subTreeString = subTreeString.replace(
