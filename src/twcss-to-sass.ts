@@ -110,8 +110,9 @@ function getStyleContents(element: IHtmlNode): IHtmlNode {
  * Filter IHtmlNode array by node type and tagName
  *
  * @param {string} htmlJson
+ * @param {number} deepth
  *
- * @returns Object
+ * @returns IHtmlNode
  */
 function filterHtmlData(nodeTree: IHtmlNode[], deepth = 0): IHtmlNode[] {
   if (nodeTree.length > 0) {
@@ -332,30 +333,25 @@ function groupUtilityToSass(
  * Extract SASS tree from HTML JSON tree
  *
  * @param {IHtmlNode} nodeTree
- * @param {int} deepth
  *
  * @returns string
  */
-function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
+function getSassTree(nodeTree: IHtmlNode[]) {
   return nodeTree
     .map((node: IHtmlNode) => {
       let treeString = '',
         subTreeString = ''
 
       if (Array.isArray(node.children) && node.children.length) {
-        ++deepth
-
-        subTreeString = getSassTree(node.children, deepth)
+        subTreeString = getSassTree(node.children)
       }
 
       if (node.filterAttributes) {
         // print tailwind class names
         if (node.filterAttributes.class) {
-          let tailwindClassList = node.filterAttributes.class
+          treeString += node.filterAttributes.class
             ? `@apply ${node.filterAttributes.class};`
             : ''
-
-          treeString += tailwindClassList
         }
 
         // inline style printing
@@ -373,17 +369,18 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
 
       if (treeString.length || subTreeString.length) {
         const classComment = _defaultOptions.printComments
-          ? `/* ${node.comment ? node.comment : node.tagName} -> ${
-              node.order
+          ? `/* ${node.comment ? node.comment : node.tagName}${
+              node.order ? ' -> ' + node.order : ''
             } */`
           : ''
 
-        const className = getClassName(node, deepth)
+        const className = getClassName(node, node.order)
 
         let groupUtilityTree = ''
 
+        // convert group utilities
         if (node.filterAttributes?.class?.match(/ (group)(?!-)/gm)) {
-          groupUtilityTree = groupUtilityToSass(node.children, deepth)
+          groupUtilityTree = groupUtilityToSass(node.children, node.order)
 
           if (groupUtilityTree !== '') {
             treeString += groupUtilityTree
@@ -408,24 +405,21 @@ function getSassTree(nodeTree: IHtmlNode[], deepth = 0) {
       return null
     })
     .join('')
-
-  return ''
 }
 
 /**
  * Get ready to use HTML tree
  *
  * @param {IHtmlNode} nodeTree
- * @param {int} deepth
  *
  * @returns string
  */
-function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
+function getHtmlTree(nodeTree: IHtmlNode[]): string {
   if (nodeTree) {
     let htmlTree = ''
 
     nodeTree.forEach(function (node: IHtmlNode, index) {
-      const className = getClassName(node, deepth)
+      const className = getClassName(node, node.order)
 
       if (node.type == 'element' && node.tagName != 'style') {
         if (_defaultOptions.printComments) {
@@ -479,7 +473,7 @@ function getHtmlTree(nodeTree: IHtmlNode[], deepth = 0): string {
 
         // sub tree
         if (hasSubElement) {
-          htmlTree += getHtmlTree(node.children, deepth + 1)
+          htmlTree += getHtmlTree(node.children)
         }
 
         // prevent new line for siblings
