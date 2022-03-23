@@ -1,3 +1,4 @@
+import { ITwToSassOptions } from '../src/interfaces/tw-to-sass-options'
 import { convertToSass } from '../src/twcss-to-sass'
 
 test('convert to sass for html', () => {
@@ -19,9 +20,9 @@ test('convert to sass for html', () => {
     </div>
 </div>`
 
-  const converterConfigs = <any>{
+  const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
-    printComments: true,
+    printSassComments: true,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -89,9 +90,9 @@ test('convert to sass for html with void elements', () => {
 
 </html>`
 
-  const converterConfigs = <any>{
+  const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
-    printComments: true,
+    printSassComments: true,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)

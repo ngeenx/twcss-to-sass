@@ -4,7 +4,8 @@ import { IClassNameOptions } from './classname-options'
 export interface ITwToSassOptions {
   formatOutput: boolean
   formatterOptions: CSSBeautifyOptions
-  printComments: boolean
+  printHtmlComments: boolean
+  printSassComments: boolean
   useCommentBlocksAsClassName: boolean
   maxClassNameLength: number
   classNameOptions: IClassNameOptions

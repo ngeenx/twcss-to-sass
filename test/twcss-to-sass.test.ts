@@ -1,3 +1,4 @@
+import { ITwToSassOptions } from '../src/interfaces/tw-to-sass-options'
 import { convertToSass } from '../src/twcss-to-sass'
 
 test('convert to sass', () => {
@@ -53,9 +54,9 @@ test('convert to sass with comments', () => {
     }
 }`
 
-  const converterConfigs = <any>{
+  const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: false,
-    printComments: true,
+    printSassComments: true,
   }
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
@@ -83,9 +84,9 @@ test('convert to sass with comments class names', () => {
     }
 }`
 
-  const converterConfigs = <any>{
+  const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
-    printComments: true,
+    printSassComments: true,
     classNameOptions: {
       lowercase: true,
       replacement: '_',

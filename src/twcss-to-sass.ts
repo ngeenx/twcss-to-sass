@@ -34,7 +34,8 @@ const defaultOptions: ITwToSassOptions = {
   formatOutput: true,
   useCommentBlocksAsClassName: true,
   maxClassNameLength: 50,
-  printComments: true,
+  printHtmlComments: true,
+  printSassComments: true,
   formatterOptions: formatterOptions,
   classNameOptions: {
     lowercase: true,
@@ -462,7 +463,7 @@ function getSassTree(nodeTree: IHtmlNode[]): string {
       }
 
       if (treeString.length || subTreeString.length) {
-        const classComment = _defaultOptions.printComments
+        const classComment = _defaultOptions.printSassComments
           ? `/* ${node.comment ? node.comment : node.tagName}${
               node.order ? ' -> ' + node.order : ''
             } */`
@@ -528,7 +529,7 @@ function getHtmlTree(nodeTree: IHtmlNode[]): string {
       const className = getClassName(node, node.order)
 
       if (node.type == 'element' && node.tagName != 'style') {
-        if (_defaultOptions.printComments) {
+        if (_defaultOptions.printHtmlComments) {
           if (node.comment) {
             htmlTree += `\n<!-- ${node.comment.trim()} -->`
           }
