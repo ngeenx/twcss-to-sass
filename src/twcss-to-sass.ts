@@ -432,86 +432,92 @@ function peerUtilityToSass(
  * @returns string
  */
 function getSassTree(nodeTree: IHtmlNode[]): string {
-  return nodeTree
-    .map((node: IHtmlNode) => {
-      let treeString = '',
-        subTreeString = ''
+  let sassTree = ''
 
-      if (Array.isArray(node.children) && node.children.length) {
-        subTreeString = getSassTree(node.children)
-      }
+  nodeTree.forEach((node: IHtmlNode) => {
+    let treeString = '',
+      subTreeString = ''
 
-      if (node.filterAttributes) {
-        // print tailwind class names
-        if (node.filterAttributes.class) {
-          treeString += node.filterAttributes.class
-            ? `@apply ${node.filterAttributes.class};`
-            : ''
-        }
+    const hasSubElement = node.children?.filter(
+      (child) => child.type === 'element'
+    ).length
 
-        // inline style printing
-        if (node.filterAttributes.style) {
-          node.filterAttributes.style = Utils.addMissingSuffix(
-            node.filterAttributes.style,
-            ';'
-          )
+    if (hasSubElement) {
+      subTreeString = getSassTree(node.children)
+    }
 
-          treeString += node.filterAttributes.style
-            ? `\n\n${node.filterAttributes.style}`
-            : ''
-        }
-      }
-
-      if (treeString.length || subTreeString.length) {
-        const classComment = _defaultOptions.printSassComments
-          ? `/* ${node.comment ? node.comment : node.tagName}${
-              node.order ? ' -> ' + node.order : ''
-            } */`
+    if (node.filterAttributes) {
+      // print tailwind class names
+      if (node.filterAttributes.class) {
+        treeString += node.filterAttributes.class
+          ? `@apply ${node.filterAttributes.class};`
           : ''
+      }
 
-        const className = getClassName(node, node.order)
+      // inline style printing
+      if (node.filterAttributes.style) {
+        node.filterAttributes.style = Utils.addMissingSuffix(
+          node.filterAttributes.style,
+          ';'
+        )
 
-        let groupUtilityTree = ''
+        treeString += node.filterAttributes.style
+          ? `\n\n${node.filterAttributes.style}`
+          : ''
+      }
+    }
 
-        // convert group utilities
-        if (node.filterAttributes?.class?.match(/(group)(?!-)/gm)) {
-          groupUtilityTree = groupUtilityToSass(node.children)
+    if (treeString.length || subTreeString.length) {
+      const classComment = _defaultOptions.printSassComments
+        ? `/* ${node.comment ? node.comment : node.tagName}${
+            node.order ? ' -> ' + node.order : ''
+          } */`
+        : ''
 
-          if (groupUtilityTree !== '') {
-            treeString += groupUtilityTree
+      const className = getClassName(node, node.order)
 
-            // clear parent group class name
-            treeString = treeString.replace(/(group)(?!-)/gm, ' ')
+      let groupUtilityTree = ''
 
-            // clear group modifier classes from @apply
-            subTreeString = subTreeString.replace(
-              / group-([a-z0-9]+):([a-z0-9-:\/]+)/gm,
-              ''
-            )
-          }
+      // convert group utilities
+      if (node.filterAttributes?.class?.match(/(group)(?!-)/gm)) {
+        groupUtilityTree = groupUtilityToSass(node.children)
+
+        if (groupUtilityTree !== '') {
+          treeString += groupUtilityTree
+
+          // clear parent group class name
+          treeString = treeString.replace(/(group)(?!-)/gm, ' ')
+
+          // clear group modifier classes from @apply
+          subTreeString = subTreeString.replace(
+            / group-([a-z0-9]+):([a-z0-9-:\/]+)/gm,
+            ''
+          )
         }
+      }
 
-        let peerUtilityTree = ''
+      let peerUtilityTree = ''
 
-        // convert peer utilities
-        if (node.filterAttributes?.class?.match(/(peer)(?!-)/gm)) {
-          peerUtilityTree = peerUtilityToSass(nodeTree, className)
+      // convert peer utilities
+      if (node.filterAttributes?.class?.match(/(peer)(?!-)/gm)) {
+        peerUtilityTree = peerUtilityToSass(nodeTree, className)
 
-          if (peerUtilityTree !== '') {
-            // clear parent group class name
-            treeString = treeString.replace(/(peer)(?!-)/gm, ' ')
-          }
+        if (peerUtilityTree !== '') {
+          // clear parent group class name
+          treeString = treeString.replace(/(peer)(?!-)/gm, ' ')
         }
+      }
 
-        return `${classComment}${peerUtilityTree}
+      sassTree += `${classComment}${peerUtilityTree}
           ${className} {
             ${treeString} ${subTreeString}
           }`
-      }
+    }
 
-      return null
-    })
-    .join('')
+    return null
+  })
+
+  return sassTree
 }
 
 /**
