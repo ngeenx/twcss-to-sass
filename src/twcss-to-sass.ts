@@ -120,7 +120,8 @@ function filterHtmlData(nodeTree: IHtmlNode[], deepth = 0): IHtmlNode[] {
   if (nodeTree.length > 0) {
     // we do need to empty or doctype declaration
     nodeTree = nodeTree.filter(
-      (x: IHtmlNode) => x.content !== ' ' && x.tagName != '!doctype'
+      (x: IHtmlNode) =>
+        x.content !== ' ' && x.tagName != '!doctype' && x.tagName != 'script'
     )
 
     nodeTree.forEach((node: IHtmlNode, index) => {
@@ -696,6 +697,7 @@ export function convertToSass(
         htmlTreeResult = ''
 
       if (sassTreeResult) {
+        // clean peer utility classes
         sassTreeResult = sassTreeResult.replace(
           / peer-([a-z0-9]+):([a-z0-9-:\/]+)/gm,
           ''
