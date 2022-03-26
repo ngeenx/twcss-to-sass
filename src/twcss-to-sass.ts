@@ -203,7 +203,7 @@ function getClassName(node: IHtmlNode, deepth: number): string {
     className = `${node.tagName}`
   } // default placeholder class name
   else {
-    className = `.class-${node.tagName}-${deepth}`
+    className = `.class-${node.tagName}${deepth ? '-' + deepth : ''}`
   }
 
   return className
