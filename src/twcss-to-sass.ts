@@ -37,6 +37,7 @@ const defaultOptions: ITwToSassOptions = {
   printHtmlComments: true,
   printSassComments: true,
   formatterOptions: formatterOptions,
+  preventDuplicateClasses: true,
   classNameOptions: {
     lowercase: true,
     replacement: '-',
@@ -351,7 +352,6 @@ function peerUtilityToSass(
 
   nodeTree.forEach((node: IHtmlNode) => {
     if (node.filterAttributes) {
-      console.log(node.filterAttributes.class?.match(groupPattern))
       if (
         node.filterAttributes.class &&
         node.filterAttributes.class?.match(groupPattern)
@@ -364,8 +364,6 @@ function peerUtilityToSass(
             utility: matches?.[2],
             className: getClassName(node, node.order),
           }
-
-          console.log(groupModifierPair)
 
           peerModifierList.push(groupModifierPair)
         })
@@ -425,6 +423,40 @@ function peerUtilityToSass(
 }
 
 /**
+ * Get class name and styles of node as SASS format
+ *
+ * @param node IHtmlNode
+ *
+ * @returns string
+ */
+function getNodeClassAndStyles(node: IHtmlNode): string {
+  let nodeClassAndStyles = ''
+
+  if (node.filterAttributes) {
+    // print tailwind class names
+    if (node.filterAttributes.class) {
+      nodeClassAndStyles += node.filterAttributes.class
+        ? `@apply ${node.filterAttributes.class};`
+        : ''
+    }
+
+    // inline style printing
+    if (node.filterAttributes.style) {
+      node.filterAttributes.style = Utils.addMissingSuffix(
+        node.filterAttributes.style,
+        ';'
+      )
+
+      nodeClassAndStyles += node.filterAttributes.style
+        ? `\n\n${node.filterAttributes.style}`
+        : ''
+    }
+  }
+
+  return nodeClassAndStyles
+}
+
+/**
  * Extract SASS tree from HTML JSON tree
  *
  * @param {IHtmlNode} nodeTree
@@ -432,9 +464,11 @@ function peerUtilityToSass(
  * @returns string
  */
 function getSassTree(nodeTree: IHtmlNode[]): string {
-  let sassTree = ''
+  let sassTree = '',
+    isLastLevel = false,
+    duplicatedItems: string[] = []
 
-  nodeTree.forEach((node: IHtmlNode) => {
+  nodeTree.forEach((node: IHtmlNode, index) => {
     let treeString = '',
       subTreeString = ''
 
@@ -444,28 +478,45 @@ function getSassTree(nodeTree: IHtmlNode[]): string {
 
     if (hasSubElement) {
       subTreeString = getSassTree(node.children)
+
+      isLastLevel = false
+    } else if (_defaultOptions.preventDuplicateClasses) {
+      isLastLevel = true
     }
 
-    if (node.filterAttributes) {
-      // print tailwind class names
-      if (node.filterAttributes.class) {
-        treeString += node.filterAttributes.class
-          ? `@apply ${node.filterAttributes.class};`
-          : ''
-      }
+    let nodeClassAndStyles = ''
 
-      // inline style printing
-      if (node.filterAttributes.style) {
-        node.filterAttributes.style = Utils.addMissingSuffix(
-          node.filterAttributes.style,
-          ';'
-        )
+    nodeClassAndStyles += getNodeClassAndStyles(node)
 
-        treeString += node.filterAttributes.style
-          ? `\n\n${node.filterAttributes.style}`
-          : ''
+    if (
+      _defaultOptions.preventDuplicateClasses &&
+      isLastLevel &&
+      nodeTree[index + 1]
+    ) {
+      const _hasSubElement = nodeTree[index + 1].children?.filter(
+        (child) => child.type === 'element'
+      ).length
+
+      if (!_hasSubElement) {
+        const _nodeClassAndStyles = getNodeClassAndStyles(nodeTree[index + 1])
+
+        // compare node sass content with next node sass content or
+        // in same level other nodes
+        if (nodeClassAndStyles != '' && _nodeClassAndStyles != '') {
+          if (
+            nodeClassAndStyles == _nodeClassAndStyles ||
+            !duplicatedItems.includes(nodeClassAndStyles)
+          ) {
+            duplicatedItems.push(_nodeClassAndStyles)
+
+            // clear duplicated node sass content
+            nodeClassAndStyles = ''
+          }
+        }
       }
     }
+
+    treeString += nodeClassAndStyles
 
     if (treeString.length || subTreeString.length) {
       const classComment = _defaultOptions.printSassComments

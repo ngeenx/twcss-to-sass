@@ -1,6 +1,6 @@
 {
   "name": "@egoistdeveloper/twcss-to-sass",
-  "version": "2.1.13",
+  "version": "2.1.14",
   "description": "HTML template to SASS converter for TailwindCSS",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -15,6 +15,10 @@
     "build:esm": "node tools/cleanup esm && tsc -p config/tsconfig.esm.json",
     "build:umd": "node tools/cleanup umd && webpack --config config/webpack.config.js",
     "build:types": "node tools/cleanup types && tsc -p config/tsconfig.types.json",
+    "build:cjs:watch": "tsc --watch -p config/tsconfig.cjs.json",
+    "build:esm:watch": "tsc --watch -p config/tsconfig.esm.json",
+    "build:umd:watch": "webpack --watch --progress --config config/webpack.config.js",
+    "build:types:watch": "tsc --watch -p config/tsconfig.types.json",
     "clean": "node tools/cleanup",
     "package": "npm run build && npm pack",
     "test": "jest --no-cache --runInBand",

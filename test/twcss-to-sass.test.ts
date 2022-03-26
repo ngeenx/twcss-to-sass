@@ -45,17 +45,17 @@ test('convert to sass with comments', () => {
 <!-- Container End-->`
 
   const sassOutput = `/* Container Any -> 1 */
-.class-div-1 {
+.container-any {
     @apply bg-white;
 
     /* Some Div -> 2 */
-    .class-div-2 {
+    .some-div {
         @apply flex justify-center items-center min-h-screen min-w-full;
     }
 }`
 
   const converterConfigs = <ITwToSassOptions>{
-    useCommentBlocksAsClassName: false,
+    useCommentBlocksAsClassName: true,
     printSassComments: true,
   }
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -131,3 +131,52 @@ test('convert to sass with group-modifier', () => {
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
+
+test('convert to sass with non-duplicated classes', () => {
+  const htmlCotnent = `<!-- Rating -->
+  <div class="flex flex-row group">
+      <i class="mdi mdi-star text-xs text-amber-400
+          hover:text-amber-500 transition-all duration-200"
+          title="Worst"></i>
+
+      <i class="mdi mdi-star text-xs text-amber-400
+          hover:text-amber-500 transition-all duration-200"
+          title="Bad"></i>
+
+      <i class="mdi mdi-star text-xs text-amber-400
+          hover:text-amber-500 transition-all duration-200"
+          title="Not Bad"></i>
+
+      <i class="mdi mdi-star text-xs text-amber-400
+          hover:text-amber-500 transition-all duration-200"
+          title="Good"></i>
+
+      <i class="mdi mdi-star text-xs text-amber-400
+          hover:text-amber-500 transition-all duration-200"
+          title="Awesome"></i>
+
+      <div class="text-xxs text-gray-400 ml-1 hover:underline">
+          text
+      </div>
+  </div>`
+
+  const sassOutput = `/* Rating -> 1 */
+.rating {
+    @apply flex flex-row group;
+
+    /* i */
+    i {
+        @apply mdi mdi-star text-xs text-amber-400 hover:text-amber-500 transition-all duration-200;
+    }
+
+    /* div -> 2 */
+    .class-div-2 {
+        @apply text-xxs text-gray-400 ml-1 hover:underline;
+    }
+}`
+
+  const converterResult = convertToSass(htmlCotnent)
+
+  expect(converterResult?.sass).toBe(sassOutput)
+})
+
