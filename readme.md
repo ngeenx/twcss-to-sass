@@ -7,8 +7,15 @@ HTML template to SASS converter for TailwindCSS
 [![NPM Type Definitions](https://img.shields.io/npm/types/@egoistdeveloper/twcss-to-sass)](https://www.npmjs.com/package/@egoistdeveloper/twcss-to-sass)
 [![NPM](https://img.shields.io/npm/l/@egoistdeveloper/twcss-to-sass)](https://github.com/EgoistDeveloper/twcss-to-sass/blob/dev/LICENSE)
 
-## 🚀 **[Playground](https://egoistdeveloper.github.io/twcss-to-sass-playground)**
+## About
 
+There are many tailwind component sharing platforms, snippet websites, code pens, UI kits, etc. We generally see static demos and inline class lists like `<div class="text-base leading-6 text-gray-500 hover:text-gray-900">...`. If you want to choose the SASS option for your project, you need to convert inline classes and templates one by one. And this process takes time. This tool converts inline class lists to SASS and it takes just milliseconds.
+
+This tool is useful for a quick start but all cases did not consider. There are many edge cases. So, you may need to refactor output HTML and SASS results.
+
+## 🚀 [Playground](https://egoistdeveloper.github.io/twcss-to-sass-playground)
+
+Use converter playground for quick start.
 
 ## 📦 Installation
 
