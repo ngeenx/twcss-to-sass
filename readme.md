@@ -26,11 +26,11 @@ npm i @egoistdeveloper/twcss-to-sass
 
 ## Todo
 
-- [x] ~~Fix missing texts with child element~~
-- [x] ~~Fix self-closing tags like `link`, `base`, `area`, `br` etc~~
-- [x] ~~Fix url conflict with class name in comment line~~
-- [ ] Add option for duplicated classes
-- [ ] ~~Fix `group` and `peer` utility classes issue on SASS~~
+- [x] Fix missing texts with child element
+- [x] Fix self-closing tags like `link`, `base`, `area`, `br` etc
+- [x] Fix url conflict with class name in comment line
+- [x] Add option for duplicated classes
+- [x] Fix `group` and `peer` utility classes issue on SASS
 - [ ] Filter non tailwind classes
 - [ ] Order classes
 - [ ] Group classes
