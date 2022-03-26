@@ -678,6 +678,13 @@ export function convertToSass(
 ): null | IConverterResult {
   styles = []
 
+  let startTime = 0,
+    endTime = 0
+
+  if (typeof performance !== 'undefined') {
+    startTime = performance.now()
+  }
+
   if (html && html.length) {
     if (options) {
       _defaultOptions = {
@@ -719,15 +726,25 @@ export function convertToSass(
           _defaultOptions.formatterOptions
         )
 
+        if (typeof performance !== 'undefined') {
+          endTime = performance.now()
+        }
+
         return {
           sass: Utils.fixFomatterApplyIssue(formattedSassResult),
           html: formattedHtmlResult,
+          executionTime: (endTime - startTime).toFixed(2) + ' ms',
         }
+      }
+
+      if (typeof performance !== 'undefined') {
+        endTime = performance.now()
       }
 
       return {
         sass: sassTreeResult,
         html: htmlTreeResult,
+        executionTime: (endTime - startTime).toFixed(2) + ' ms',
       }
     }
   }
