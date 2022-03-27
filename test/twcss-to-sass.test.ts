@@ -10,7 +10,11 @@ test('convert to sass', () => {
     @apply w-72 h-40 bg-green-400 transform transition-all;
 }`
 
-  const converterResult = convertToSass(htmlCotnent)
+  const converterConfigs = <ITwToSassOptions>{
+    orderByTailwindClasses: false
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
@@ -28,7 +32,11 @@ test('convert to sass with inline css', () => {
     font-weight: 50px;
 }`
 
-  const converterResult = convertToSass(htmlCotnent)
+  const converterConfigs = <ITwToSassOptions>{
+    orderByTailwindClasses: false
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
@@ -57,7 +65,9 @@ test('convert to sass with comments', () => {
   const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
     printSassComments: true,
+    orderByTailwindClasses: false
   }
+
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
@@ -87,6 +97,7 @@ test('convert to sass with comments class names', () => {
   const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
     printSassComments: true,
+    orderByTailwindClasses: false,
     classNameOptions: {
       lowercase: true,
       replacement: '_',
@@ -127,7 +138,11 @@ test('convert to sass with group-modifier', () => {
     }
 }`
 
-  const converterResult = convertToSass(htmlCotnent)
+  const converterConfigs = <ITwToSassOptions>{
+    orderByTailwindClasses: false
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
@@ -175,8 +190,33 @@ test('convert to sass with non-duplicated classes', () => {
     }
 }`
 
-  const converterResult = convertToSass(htmlCotnent)
+  const converterConfigs = <ITwToSassOptions>{
+    orderByTailwindClasses: false
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
 
   expect(converterResult?.sass).toBe(sassOutput)
 })
 
+test('convert to sass with class ordering', () => {
+  const htmlCotnent = `<!-- My Button -->
+<button class="flex items-center justify-center w-full px-4 py-2 space-x-1 font-medium tracking-wider uppercase bg-gray-100 border rounded-md focus:outline-none focus:ring">
+    test
+</button>`
+
+  const sassOutput = `/* My Button -> 1 */
+.my-button {
+    @apply bg-gray-100 border flex focus:outline-none focus:ring font-medium items-center justify-center px-4 py-2 rounded-md space-x-1 tracking-wider uppercase w-full;
+}`
+
+  const converterConfigs = <ITwToSassOptions>{
+    useCommentBlocksAsClassName: true,
+    printSassComments: true,
+    orderByTailwindClasses: true
+  }
+
+  const converterResult = convertToSass(htmlCotnent, converterConfigs)
+
+  expect(converterResult?.sass).toBe(sassOutput)
+})

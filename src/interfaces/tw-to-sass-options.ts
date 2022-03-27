@@ -8,6 +8,7 @@ export interface ITwToSassOptions {
   printSassComments: boolean
   useCommentBlocksAsClassName: boolean
   maxClassNameLength: number
-  classNameOptions: IClassNameOptions,
+  classNameOptions: IClassNameOptions
   preventDuplicateClasses: boolean
+  orderByTailwindClasses: boolean
 }

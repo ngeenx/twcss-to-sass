@@ -4,6 +4,7 @@ import beautifyCss, { CSSBeautifyOptions } from 'js-beautify'
 import Utils from './utils/utils'
 import HtmlUtils from './utils/html'
 import SlugUtils from './utils/slug'
+import ClassUtils from './utils/class'
 
 import { ITwToSassOptions } from './interfaces/tw-to-sass-options'
 import {
@@ -38,6 +39,7 @@ const defaultOptions: ITwToSassOptions = {
   printSassComments: true,
   formatterOptions: formatterOptions,
   preventDuplicateClasses: true,
+  orderByTailwindClasses: true,
   classNameOptions: {
     lowercase: true,
     replacement: '-',
@@ -436,8 +438,14 @@ function getNodeClassAndStyles(node: IHtmlNode): string {
   if (node.filterAttributes) {
     // print tailwind class names
     if (node.filterAttributes.class) {
+      let classList = ''
+
+      classList = _defaultOptions.orderByTailwindClasses
+        ? ClassUtils.orderClasses(node.filterAttributes.class)
+        : node.filterAttributes.class
+
       nodeClassAndStyles += node.filterAttributes.class
-        ? `@apply ${node.filterAttributes.class};`
+        ? `@apply ${classList};`
         : ''
     }
 
