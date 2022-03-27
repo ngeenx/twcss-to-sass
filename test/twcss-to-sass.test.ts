@@ -11,7 +11,7 @@ test('convert to sass', () => {
 }`
 
   const converterConfigs = <ITwToSassOptions>{
-    orderByTailwindClasses: false
+    orderByTailwindClasses: false,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -33,7 +33,7 @@ test('convert to sass with inline css', () => {
 }`
 
   const converterConfigs = <ITwToSassOptions>{
-    orderByTailwindClasses: false
+    orderByTailwindClasses: false,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -65,7 +65,7 @@ test('convert to sass with comments', () => {
   const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
     printSassComments: true,
-    orderByTailwindClasses: false
+    orderByTailwindClasses: false,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -139,7 +139,7 @@ test('convert to sass with group-modifier', () => {
 }`
 
   const converterConfigs = <ITwToSassOptions>{
-    orderByTailwindClasses: false
+    orderByTailwindClasses: false,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -191,7 +191,7 @@ test('convert to sass with non-duplicated classes', () => {
 }`
 
   const converterConfigs = <ITwToSassOptions>{
-    orderByTailwindClasses: false
+    orderByTailwindClasses: false,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
@@ -213,7 +213,7 @@ test('convert to sass with class ordering', () => {
   const converterConfigs = <ITwToSassOptions>{
     useCommentBlocksAsClassName: true,
     printSassComments: true,
-    orderByTailwindClasses: true
+    orderByTailwindClasses: true,
   }
 
   const converterResult = convertToSass(htmlCotnent, converterConfigs)
