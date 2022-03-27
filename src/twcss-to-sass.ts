@@ -3,7 +3,6 @@ import beautifyCss, { CSSBeautifyOptions } from 'js-beautify'
 
 import Utils from './utils/utils'
 import HtmlUtils from './utils/html'
-import SlugUtils from './utils/slug'
 import ClassUtils from './utils/class'
 
 import { ITwToSassOptions } from './interfaces/tw-to-sass-options'
@@ -170,51 +169,6 @@ function filterHtmlData(nodeTree: IHtmlNode[], deepth = 0): IHtmlNode[] {
 /**
  * Get CSS class name from node details
  *
- * @param node IHtmlNode
- * @param deepth number
- *
- * @returns string
- */
-function getClassName(node: IHtmlNode, deepth: number): string {
-  let className = ''
-
-  const exceptTagNames = ['html', 'head', 'body', 'style']
-
-  // comment to class name
-  if (node.comment && _defaultOptions.useCommentBlocksAsClassName) {
-    let classSlug = _defaultOptions.classNameOptions.prefix
-
-    classSlug += SlugUtils.slugify(
-      SlugUtils.removeUrl(node.comment),
-      _defaultOptions.classNameOptions
-    )
-
-    classSlug =
-      classSlug.length > _defaultOptions.maxClassNameLength
-        ? classSlug.substring(0, _defaultOptions.maxClassNameLength)
-        : classSlug
-
-    classSlug += _defaultOptions.classNameOptions.suffix
-
-    className = '.' + classSlug
-  } // tag name selector
-  else if (
-    exceptTagNames.indexOf(node.tagName) > -1 ||
-    (!node.hasElementChildren && node.tagName != 'div')
-  ) {
-    // TODO: add exclude option for tag names
-    className = `${node.tagName}`
-  } // default placeholder class name
-  else {
-    className = `.class-${node.tagName}${deepth ? '-' + deepth : ''}`
-  }
-
-  return className
-}
-
-/**
- * Get CSS class name from node details
- *
  * @param styles IHtmlNode[]
  *
  * @returns string
@@ -267,7 +221,11 @@ function groupUtilityToSass(
           const groupModifierPair = <IGroupModifierPair>{
             modifier: matches?.[1],
             utility: matches?.[2],
-            className: getClassName(node, node.order),
+            className: ClassUtils.getClassName(
+              node,
+              node.order,
+              _defaultOptions
+            ),
           }
 
           groupModifierList.push(groupModifierPair)
@@ -365,7 +323,11 @@ function peerUtilityToSass(
           const groupModifierPair = <IGroupModifierPair>{
             modifier: matches?.[1],
             utility: matches?.[2],
-            className: getClassName(node, node.order),
+            className: ClassUtils.getClassName(
+              node,
+              node.order,
+              _defaultOptions
+            ),
           }
 
           peerModifierList.push(groupModifierPair)
@@ -534,7 +496,11 @@ function getSassTree(nodeTree: IHtmlNode[]): string {
           } */`
         : ''
 
-      const className = getClassName(node, node.order)
+      const className = ClassUtils.getClassName(
+        node,
+        node.order,
+        _defaultOptions
+      )
 
       let groupUtilityTree = ''
 
@@ -592,7 +558,11 @@ function getHtmlTree(nodeTree: IHtmlNode[]): string {
     let htmlTree = ''
 
     nodeTree.forEach(function (node: IHtmlNode, index) {
-      const className = getClassName(node, node.order)
+      const className = ClassUtils.getClassName(
+        node,
+        node.order,
+        _defaultOptions
+      )
 
       if (node.type == 'element' && node.tagName != 'style') {
         if (_defaultOptions.printHtmlComments) {
