@@ -39,7 +39,7 @@ npm i @egoistdeveloper/twcss-to-sass
 - [x] Add option for duplicated classes
 - [x] Fix `group` and `peer` utility classes issue on SASS
 - [ ] Filter non tailwind classes
-- [ ] Order classes
+- [x] Order classes
 - [ ] Group classes
 - [ ] Print as group classes
 - [ ] Add configs menu for playground
@@ -50,7 +50,6 @@ npm i @egoistdeveloper/twcss-to-sass
 
 ```xml
 <!-- Container Start -->
-<!-- Container Any -->
 <div class="bg-white">
 	<!-- Some Div -->
 	<div class="flex justify-center items-center min-h-screen min-w-full">
@@ -68,13 +67,15 @@ npm i @egoistdeveloper/twcss-to-sass
 **HTML Output**
 
 ```xml
-<!-- Container Start, Container Any -->
-<div class="class-div-0">
+<!-- Container Start -->
+<div class="container-start">
     <!-- Some Div -->
-    <div class="class-div-1">
-        <div class="class-div-2">
+    <div class="some-div">
+        <div class="class-div-3">
             <!-- Inner Div -->
-            <div class="class-div-3"></div>
+            <div class="inner-div">
+                My Text 1
+            </div>
         </div>
     </div>
 </div>
@@ -83,21 +84,21 @@ npm i @egoistdeveloper/twcss-to-sass
 **SASS Output**
 
 ```scss
-/* Container Start, Container Any -> 1 */
-.class-1-div {
+/* Container Start -> 1 */
+.container-start {
     @apply bg-white;
 
     /* Some Div -> 2 */
-    .class-2-div {
-        @apply flex justify-center items-center min-h-screen min-w-full;
+    .some-div {
+        @apply flex items-center justify-center min-h-screen min-w-full;
 
         /* div -> 3 */
-        .class-3-div {
+        .class-div-3 {
             @apply flex relative;
 
             /* Inner Div -> 4 */
-            .class-3-div {
-                @apply w-72 h-40 bg-green-400 transform transition-all;
+            .inner-div {
+                @apply bg-green-400 h-40 transform transition-all w-72;
             }
         }
     }
@@ -118,17 +119,16 @@ npm i @egoistdeveloper/twcss-to-sass
 <script>
     const { convertToSass } = TwCssToSass,
     html = `<!-- Container Start -->
-            <!-- Container Any -->
             <div class="bg-white">
-                <!-- Some Div -->
-                <div class="flex justify-center items-center min-h-screen">
-                    <div class="flex relative">
-                        <!-- Inner Div -->
-                        <div class="w-72 h-40 bg-green-400 absolute">
-                            My Text 1
-                        </div>
-                    </div>
+              <!-- Some Div -->
+              <div class="flex justify-center items-center min-h-screen min-w-full">
+                <div class="flex relative">
+                  <!-- Inner Div -->
+                  <div class="w-72 h-40 bg-green-400 transform transition-all">
+                    My Text 1
+                  </div>
                 </div>
+              </div>
             </div>
             <!-- Container End-->`;
 
@@ -149,8 +149,8 @@ const htmlContent = fs.readFileSync(
   'UTF-8'
 )
 
-console.log(TwCssToSass.convertToSass(htmlContent).sass);
 console.log(TwCssToSass.convertToSass(htmlContent).html);
+console.log(TwCssToSass.convertToSass(htmlContent).sass);
 
 ```
 
@@ -161,8 +161,8 @@ import { convertToSass } from '@egoistdeveloper/twcss-to-sass';
 
 const htmlContent = '<div class="w-72 h-40 bg-green-400 transform transition-all">My Text 1</div>';
 
-console.log(convertToSass(htmlContent).sass);
 console.log(convertToSass(htmlContent).html);
+console.log(convertToSass(htmlContent).sass);
 
 ```
 
