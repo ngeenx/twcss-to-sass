@@ -41,9 +41,10 @@ npm i @egoistdeveloper/twcss-to-sass
 - [x] Fix `group` and `peer` utility classes issue on SASS
 - [ ] Filter non tailwind classes
 - [x] Order classes
-- [ ] Group classes
+- [x] Group classes
 - [ ] Print as group classes
-- [ ] Add configs menu for playground
+- [x] Add configs menu for playground
+- [ ] Detect tailwind classes
 
 ## Input-Output
 

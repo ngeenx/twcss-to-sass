@@ -39,6 +39,7 @@ const defaultOptions: ITwToSassOptions = {
   formatterOptions: formatterOptions,
   preventDuplicateClasses: true,
   orderByTailwindClasses: true,
+  groupByTailwindClasses: true,
   classNameOptions: {
     lowercase: true,
     replacement: '-',
@@ -207,7 +208,7 @@ function groupUtilityToSass(
 
   let groupSass = ''
 
-  const groupPattern = / group-([a-z0-9]+):([a-z0-9-:\/]+)/gm
+  const groupPattern = / ?group-([a-z0-9]+):([a-z0-9-:\/]+)/gm
 
   nodeTree.forEach((node: IHtmlNode) => {
     if (node.filterAttributes) {
@@ -402,9 +403,20 @@ function getNodeClassAndStyles(node: IHtmlNode): string {
     if (node.filterAttributes.class) {
       let classList = ''
 
-      classList = _defaultOptions.orderByTailwindClasses
-        ? ClassUtils.orderClasses(node.filterAttributes.class)
-        : node.filterAttributes.class
+      // order classes by word group
+      if (_defaultOptions.groupByTailwindClasses) {
+        classList = _defaultOptions.orderByTailwindClasses
+          ? ClassUtils.groupClasses(
+              node.filterAttributes.class,
+              _defaultOptions.orderByTailwindClasses
+            )
+          : node.filterAttributes.class
+      } // order classes by text
+      else {
+        classList = _defaultOptions.orderByTailwindClasses
+          ? ClassUtils.orderClasses(node.filterAttributes.class)
+          : node.filterAttributes.class
+      }
 
       nodeClassAndStyles += node.filterAttributes.class
         ? `@apply ${classList};`
@@ -436,8 +448,9 @@ function getNodeClassAndStyles(node: IHtmlNode): string {
  */
 function getSassTree(nodeTree: IHtmlNode[]): string {
   let sassTree = '',
-    isLastLevel = false,
-    duplicatedItems: string[] = []
+    isLastLevel = false
+
+  const duplicatedItems: string[] = []
 
   nodeTree.forEach((node: IHtmlNode, index) => {
     let treeString = '',

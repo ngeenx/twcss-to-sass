@@ -22,6 +22,63 @@ const ClassUtils = {
   },
 
   /**
+   * Group by class names
+   *
+   * @param classes string
+   * @param sort boolean
+   * @returns string
+   */
+  groupClasses(classes: string, sort = false): string {
+    // group by class names
+    const classGroups = classes.split(/\s+/g)?.reduce(
+      (
+        result: {
+          [key: string]: string[]
+        },
+        word: string
+      ) => {
+        let _word = null
+
+        if (word) {
+          const match = word?.match('-?[a-z0-9]+')
+
+          if (match && match[0]) {
+            _word = match[0]
+          } else {
+            _word = word
+          }
+        }
+
+        if (!result) {
+          result = {}
+        }
+
+        if (_word) {
+          result[_word] = result[_word] || []
+          result[_word].push(word)
+        }
+
+        return result
+      },
+      {}
+    )
+
+    // convert to string back
+    const classGroupsMerged = Object.entries(classGroups)
+      .sort((a, b) => {
+        // sort by group name (as key)
+        return sort ? (a > b ? 1 : a < b ? -1 : 0) : 0
+      })
+      .map(function (item) {
+        // merge group classes
+        return item[1].join(' ')
+      })
+      .join(' ')
+
+    return classGroupsMerged
+  },
+
+  /**
    * Get CSS class name from node details
    *
    * @param node IHtmlNode

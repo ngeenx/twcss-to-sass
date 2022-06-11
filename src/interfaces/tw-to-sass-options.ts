@@ -11,4 +11,5 @@ export interface ITwToSassOptions {
   classNameOptions: IClassNameOptions
   preventDuplicateClasses: boolean
   orderByTailwindClasses: boolean
+  groupByTailwindClasses: boolean
 }
