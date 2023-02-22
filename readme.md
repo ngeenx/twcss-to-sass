@@ -1,5 +1,5 @@
 # twcss-to-sass
-[![EgoistDeveloper twCss-to-sass](https://preview.dragon-code.pro/EgoistDeveloper/twCss-to-sass.svg)](https://github.com/EgoistDeveloper/twcss-to-sass)
+[![EgoistDeveloper twcss-to-sass](https://preview.dragon-code.pro/EgoistDeveloper/TW-CSS-to-SASS.svg)](https://github.com/EgoistDeveloper/twcss-to-sass)
 
 HTML template to SASS converter for TailwindCSS
 
